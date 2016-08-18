@@ -12,7 +12,6 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#222222"
         android:textSize="16sp"
         tools:text="Text Line Item"
         />

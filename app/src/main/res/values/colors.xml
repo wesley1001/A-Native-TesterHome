@@ -39,4 +39,9 @@
     <color name="selectable_item_background_general_light_pressed">#ffeeeeee</color>
     <color name="selectable_item_background_general_dark_normal">#ff3c3c3c</color>
     <color name="selectable_item_background_general_dark_pressed">#ff444444</color>
+
+    <color name="material_grey_900">#ff212121</color>
+    <color name="material_grey_850">#ff303030</color>
+    <color name="material_grey_100">#fff5f5f5</color>
+    <color name="material_grey_50">#fffafafa</color>
 </resources>
