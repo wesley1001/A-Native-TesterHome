@@ -31,7 +31,7 @@ android {
         }
     }
     compileSdkVersion 24
-    buildToolsVersion "23.0.3"
+    buildToolsVersion "24.0.1"
     defaultConfig {
         applicationId "com.testerhome.nativeandroid"
         minSdkVersion 16
@@ -83,9 +83,9 @@ retrolambda {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:design:24.1.1'
-    compile 'com.android.support:recyclerview-v7:24.1.1'
-    compile 'com.android.support:customtabs:24.1.1'
+    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:recyclerview-v7:24.2.0'
+    compile 'com.android.support:customtabs:24.2.0'
 
     compile 'com.jakewharton:butterknife:8.0.1'
     apt 'com.jakewharton:butterknife-compiler:8.0.1'
