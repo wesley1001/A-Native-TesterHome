@@ -68,13 +68,6 @@
 -keep class com.testerhome.nativeandroid.dao.** {*;}
 -dontwarn com.testerhome.nativeandroid.dao.**
 
--keep class im.fir.sdk.** {*;}
--dontwarn im.fir.sdk.**
-
--dontwarn com.umeng.**
--keep class com.umeng.update.** {*;}
--keep class com.umeng.analytics.** {*;}
-
 -dontwarn com.tencent.**
 -keep class com.tencent.** {*;}
 
@@ -123,3 +116,7 @@ public static java.lang.String TABLENAME;
 
 -dontwarn com.tonicartos.**
 -keep class com.tonicartos.** {*;}
+
+## bugly
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}

@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -220,6 +221,7 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
         }
     }
 
+    private static final String TAG = "TopicsListAdapter";
 
     // region
     private void loadToutiao(final ViewGroup viewGroup) {
@@ -235,7 +237,7 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.e(TAG, "onError: ", e);
                     }
 
                     @Override

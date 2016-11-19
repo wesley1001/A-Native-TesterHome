@@ -38,7 +38,6 @@ import com.testerhome.nativeandroid.utils.DeviceUtil;
 import com.testerhome.nativeandroid.utils.ToastUtils;
 import com.testerhome.nativeandroid.views.base.BaseActivity;
 import com.testerhome.nativeandroid.views.widgets.ThemeUtils;
-import com.umeng.update.UmengUpdateAgent;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -68,7 +67,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         appTheme = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SettingsFragment.KEY_PREF_THEME, false);
         super.onCreate(savedInstanceState);
-        UmengUpdateAgent.update(this);
         setContentView(R.layout.activity_main);
         getWindow().setBackgroundDrawable(null);
         setupView();

@@ -11,6 +11,8 @@ public class OAuth {
     private long create_at;
     private long expireDate;
 
+    // TODO: 2016/11/20 [avatar_url] [id] [login] [name]
+
     public String getAccess_token() {
         return access_token;
     }

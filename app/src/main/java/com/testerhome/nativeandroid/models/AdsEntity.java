@@ -9,7 +9,7 @@ public class AdsEntity {
      * url : /ad/2015/0ae813cc2a8d83361c4b36ed7ed7afef.jpg
      */
 
-    private CoverEntity cover;
+    private String cover;
     private String created_at;
     private String topic_author;
     private String topic_id;
@@ -18,10 +18,6 @@ public class AdsEntity {
 
     public void set_id(int _id) {
         this._id = _id;
-    }
-
-    public void setCover(CoverEntity cover) {
-        this.cover = cover;
     }
 
     public void setCreated_at(String created_at) {
@@ -48,8 +44,12 @@ public class AdsEntity {
         return _id;
     }
 
-    public CoverEntity getCover() {
+    public String getCover() {
         return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public String getCreated_at() {
@@ -72,15 +72,4 @@ public class AdsEntity {
         return updated_at;
     }
 
-    public static class CoverEntity {
-        private String url;
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-    }
 }

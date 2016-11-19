@@ -8,11 +8,11 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.stetho.Stetho;
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.testerhome.nativeandroid.BuildConfig;
 import com.testerhome.nativeandroid.R;
 
@@ -29,7 +29,7 @@ public class NativeApp extends Application {
 
         // initialize fresco with OK HTTP
         ImagePipelineConfig config = OkHttpImagePipelineConfigFactory
-                .newBuilder(this, new OkHttpClient().newBuilder().addInterceptor(new StethoInterceptor()).build())
+                .newBuilder(this, new OkHttpClient())
                 .build();
         Fresco.initialize(this, config);
 
@@ -44,6 +44,8 @@ public class NativeApp extends Application {
         sRefWatcher = LeakCanary.install(this);
 
         Stetho.initializeWithDefaults(this);
+
+        CrashReport.initCrashReport(getApplicationContext(), "900047551", BuildConfig.DEBUG);
     }
 
     private static RefWatcher sRefWatcher;

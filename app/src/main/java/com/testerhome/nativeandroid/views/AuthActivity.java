@@ -1,6 +1,7 @@
 package com.testerhome.nativeandroid.views;
 
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +35,7 @@ public class AuthActivity extends BackBaseActivity {
     private String auth_code = "";
     private WebView mWebView;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +49,7 @@ public class AuthActivity extends BackBaseActivity {
         if (layout != null)
             layout.addView(mWebView);
 
-        mWebView.getSettings().getJavaScriptEnabled();
+        mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new WebViewClient() {
 
             @Override
@@ -115,7 +117,7 @@ public class AuthActivity extends BackBaseActivity {
                     if (response.isSuccessful()) {
                         //Convert the string result to a JSON Object
                         String responseStr = response.body().string();
-
+                        Log.e("Tokenm", "doInBackground: " + responseStr );
                         Gson gson = new Gson();
                         OAuth oAuth = gson.fromJson(responseStr,OAuth.class);
                         if (oAuth.getExpires_in() > 0 && oAuth.getAccess_token() != null) {
@@ -123,10 +125,10 @@ public class AuthActivity extends BackBaseActivity {
                             return true;
                         }
                     } else {
-                        Log.e("Tokenm", "error:" + response.message());
+                        Log.e("Tokenm", "error else:" + response.message());
                     }
                 } catch (Exception e) {
-                    Log.e("Tokenm", "error:" + response.message());
+                    Log.e("Tokenm", "error catch:" + request.url().toString(), e);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -160,7 +162,8 @@ public class AuthActivity extends BackBaseActivity {
                 .subscribe(userDetailResponse -> {
                     if (userDetailResponse != null) {
                         TesterHomeAccountService.getInstance(AuthActivity.this)
-                                .signIn(userDetailResponse.getUser().getLogin(), userDetailResponse.getUser(), oAuth);
+                                .signIn(userDetailResponse.getUser().getLogin(),
+                                        userDetailResponse.getUser(), oAuth);
                         AuthActivity.this.finish();
                     }
                 });

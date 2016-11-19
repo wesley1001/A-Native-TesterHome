@@ -27,7 +27,7 @@ import rx.Observable;
  */
 public interface TopicsService {
 
-    @GET("ads/toutiao.json")
+    @GET("ads.json")
     Observable<ToutiaoResponse> getToutiao();
 
     @GET("nodes.json")
@@ -64,7 +64,7 @@ public interface TopicsService {
             @Path("username") String username
     );
 
-    @GET("greet.json")
+    @GET("hello.json")
     Observable<UserDetailResponse> getCurrentUserInfo(
             @Query("access_token") String accessToken
     );

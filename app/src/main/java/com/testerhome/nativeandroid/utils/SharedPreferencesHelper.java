@@ -19,7 +19,7 @@ public class SharedPreferencesHelper {
 
     public SharedPreferencesHelper(Context context) {
         mContext = context;
-        sharedPreferences = mContext.getSharedPreferences(APP_NAME, 0);
+        sharedPreferences = mContext.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
     }
 
     public static synchronized SharedPreferencesHelper getInstance(Context context) {

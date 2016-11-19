@@ -58,7 +58,7 @@ public class TopicBannerAdapter extends PagerAdapter implements View.OnClickList
 
         SimpleDraweeView imageView = (SimpleDraweeView)LayoutInflater.from(container.getContext()).inflate(R.layout.banner_view, container, false);
 
-        imageView.setImageURI(Uri.parse(Config.getImageUrl(mItems.get(position).getCover().getUrl())));
+        imageView.setImageURI(Uri.parse(Config.getImageUrl(mItems.get(position).getCover())));
         imageView.setTag(mItems.get(position).getTopic_id());
         imageView.setOnClickListener(this);
 

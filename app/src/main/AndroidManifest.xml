@@ -6,9 +6,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
 
     <!-- account manager -->
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
@@ -49,16 +49,21 @@
                 android:name="android.service.chooser.chooser_target_service"
                 android:value=".TesterChooserTargetService" />
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https" android:host="testerhome.com" android:pathPrefix="/topics"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="testerhome.com"
+                    android:pathPrefix="/topics"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
             android:name=".views.DummyActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".views.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
@@ -74,18 +79,24 @@
         <activity
             android:name=".views.AboutActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name=".views.UserInfoActivity"
+        <activity
+            android:name=".views.UserInfoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name=".views.NewTopicActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-
-        <activity android:name=".views.TopicListActivity"
-                  android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name=".views.MarkDownPreviewActivity"
+        <activity
+            android:name=".views.NewTopicActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
-        <activity android:name=".views.ShowWebImageActivity"
-            android:launchMode="singleTop"/>
+        <activity
+            android:name=".views.TopicListActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".views.MarkDownPreviewActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity
+            android:name=".views.ShowWebImageActivity"
+            android:launchMode="singleTop" />
+
         <service
             android:name=".auth.UserAccountService"
             tools:ignore="ExportedService">
@@ -97,10 +108,6 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
-
-        <meta-data
-            android:name="BUG_HD_SDK_GENERAL_KEY"
-            android:value="772bad6e8f4453b59426264a4309dced" />
 
         <activity
             android:name=".views.SettingsActivity"
@@ -124,13 +131,6 @@
                 android:value=".TesterChooserTargetService" />
         </activity>
 
-        <meta-data
-            android:name="UMENG_APPKEY"
-            android:value="56302f3ee0f55a674e002bfa" />
-        <meta-data
-            android:name="UMENG_CHANNEL"
-            android:value="Channel ID" />
-
         <service
             android:name=".TesterChooserTargetService"
             android:label="TesterHomeTargetService"
@@ -139,15 +139,6 @@
                 <action android:name="android.service.chooser.ChooserTargetService" />
             </intent-filter>
         </service>
-
-        <service
-            android:name="com.umeng.update.net.DownloadingService"
-            android:process=":DownloadingService" >
-        </service>
-        <activity
-            android:name="com.umeng.update.UpdateDialogActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-        </activity>
 
     </application>
 
