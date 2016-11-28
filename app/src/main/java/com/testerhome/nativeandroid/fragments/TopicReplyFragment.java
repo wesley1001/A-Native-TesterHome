@@ -88,12 +88,9 @@ public class TopicReplyFragment extends BaseFragment {
                 DividerItemDecoration.VERTICAL_LIST));
         recyclerViewTopicList.setAdapter(mAdatper);
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mNextCursor = 0;
-                loadTopicReplies(false);
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            mNextCursor = 0;
+            loadTopicReplies(false);
         });
     }
 
