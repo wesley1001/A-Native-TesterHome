@@ -73,6 +73,9 @@ public class TopicReplyAdapter extends BaseAdapter<TopicReplyEntity> {
                     topicReplyEntity.getUser().getLogin() : topicReplyEntity.getUser().getName());
             String html = topicReplyEntity.getBody_html();
             // https://twemoji.b0.upaiyun.com/2/72x72/1f3c0.png
+            // <img src="/uploads/photo/2016/8eef4d18673bd20ddc3f338e43b673a2.png!large" width="300px" alt="">
+            // <img title=":joy_cat:" alt="😹" src="https://twemoji.b0.upaiyun.com/2/72x72/1f639.png" class="twemoji">
+            html = html.replaceAll("src=\"/", "src=\"https://testerhome.com/");
             html = html.replaceAll("/2/svg/", "/2/72x72/").replace(".svg", ".png");
 
             Log.d(TAG, "onBindViewHolder: "+ html);
