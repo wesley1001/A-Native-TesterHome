@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +72,10 @@ public class TopicReplyAdapter extends BaseAdapter<TopicReplyEntity> {
             holder.topicItemAuthor.setText(TextUtils.isEmpty(topicReplyEntity.getUser().getName()) ?
                     topicReplyEntity.getUser().getLogin() : topicReplyEntity.getUser().getName());
             String html = topicReplyEntity.getBody_html();
-            html = html.replaceAll("src=\"/photo", "src=\"https://testerhome.com/photo");
+            // https://twemoji.b0.upaiyun.com/2/72x72/1f3c0.png
+            html = html.replaceAll("/2/svg/", "/2/72x72/").replace(".svg", ".png");
+
+            Log.d(TAG, "onBindViewHolder: "+ html);
 
             holder.topicItemBody.setRichText(html);
             holder.topicItemBody.setMovementMethod(LinkMovementMethod.getInstance());

@@ -7,7 +7,7 @@ def buildTime() {
 
 def versionMajor = 1
 def versionMinor = 0
-def versionPatch = 8
+def versionPatch = 9
 def versionBuild = 0 // bump for dogfood builds, public betas, etc.
 
 
@@ -61,6 +61,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    dexOptions {
+        maxProcessCount 2
+        javaMaxHeapSize "2g"
+    }
 }
 
 dependencies {
