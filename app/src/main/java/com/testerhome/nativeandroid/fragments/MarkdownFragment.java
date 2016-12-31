@@ -121,8 +121,9 @@ public class MarkdownFragment extends BaseFragment {
             byte[] b = new byte[inputStream.available()];
             inputStream.read(b);
             prompt = new String(b);
-            prompt = prompt.concat(htmlBody.replace("<img src=\"/photo/",
-                    "<img src=\"https://testerhome.com/photo/")).concat("</body></html>");
+            htmlBody = htmlBody.replaceAll("/2/svg/", "/2/72x72/").replace(".svg", ".png");
+            prompt = prompt.concat(htmlBody.replace("<img src=\"/uploads/",
+                    "<img src=\"https://testerhome.com/uploads/")).concat("</body></html>");
             inputStream.close();
         } catch (IOException e) {
             Log.e("", "Counldn't open updrage-alter.html", e);

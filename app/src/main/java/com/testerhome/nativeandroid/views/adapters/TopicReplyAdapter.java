@@ -63,6 +63,12 @@ public class TopicReplyAdapter extends BaseAdapter<TopicReplyEntity> {
 
         if (viewHolder instanceof ReplyViewHolder) {
             TopicReplyEntity topicReplyEntity = mItems.get(position);
+            String html = topicReplyEntity.getBody_html();
+
+            if(html == null) {
+                return;
+            }
+
             ReplyViewHolder holder = (ReplyViewHolder) viewHolder;
             holder.praiseReplyLayout.setVisibility(View.VISIBLE);
             holder.userAvatar.setVisibility(View.VISIBLE);
@@ -71,7 +77,7 @@ public class TopicReplyAdapter extends BaseAdapter<TopicReplyEntity> {
             holder.topicTime.setText(StringUtils.formatPublishDateTime(topicReplyEntity.getCreated_at()));
             holder.topicItemAuthor.setText(TextUtils.isEmpty(topicReplyEntity.getUser().getName()) ?
                     topicReplyEntity.getUser().getLogin() : topicReplyEntity.getUser().getName());
-            String html = topicReplyEntity.getBody_html();
+
             // https://twemoji.b0.upaiyun.com/2/72x72/1f3c0.png
             // <img src="/uploads/photo/2016/8eef4d18673bd20ddc3f338e43b673a2.png!large" width="300px" alt="">
             // <img title=":joy_cat:" alt="😹" src="https://twemoji.b0.upaiyun.com/2/72x72/1f639.png" class="twemoji">
