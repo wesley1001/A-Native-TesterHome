@@ -42,11 +42,11 @@ public class HomeFragment extends BaseFragment {
 
     public class TopicViewPagerAdapter extends FragmentPagerAdapter {
 
-        private String[] typeName = {"最新","最热","沙发","精华"};
+        private String[] typeName = {"最新","精华","最热","沙发"};
         private String[] typeValue = {Config.TOPICS_TYPE_RECENT,
+                                        Config.TOPICS_TYPE_EXCELLENT,
                                         Config.TOPICS_TYPE_POPULAR,
-                                        Config.TOPICS_TYPE_NO_REPLY,
-                                        Config.TOPICS_TYPE_EXCELLENT};
+                                        Config.TOPICS_TYPE_NO_REPLY};
 
         public TopicViewPagerAdapter(FragmentManager fm) {
             super(fm);
