@@ -100,6 +100,12 @@ public interface TopicsService {
                                              @Query("access_token") String accessToken
     );
 
+    // TODO: 添加帖子操作支持
+    @POST("topics/{id}/action.json")
+    Observable<String> actionTopic(@Path("type") String type,   // ban - 屏蔽话题, excellent - 加精华, unexcellent - 去掉精华, close - 关闭回复, open - 开启回复
+                                   @Query("access_token") String accessToken
+    );
+
     @POST("likes.json")
     Observable<PraiseEntity> praiseTopic(@Query("obj_type") String objType,
                                    @Query("obj_id") String objId,
