@@ -284,6 +284,8 @@ public class TopicDetailActivity extends BackBaseActivity implements TopicReplyF
                                                     .getLogin()));
                                 }
                             });
+
+                            tvDetailPraise.setText(String.format("赞(%s)", topicDetailResponse.getTopic().getLikes_count()));
                             // 用户回复数
                             tvDetailRepliesCount.setText(getString(R.string.reply_count_info, mTopicEntity.getReplies_count()));
 

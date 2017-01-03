@@ -6,8 +6,8 @@ def buildTime() {
 }
 
 def versionMajor = 1
-def versionMinor = 0
-def versionPatch = 9
+def versionMinor = 1
+def versionPatch = 0
 def versionBuild = 1 // bump for dogfood builds, public betas, etc.
 
 //Properties properties = new Properties()
@@ -28,7 +28,7 @@ android {
         }
     }
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.testerhome.nativeandroid"
         minSdkVersion 16
@@ -68,9 +68,9 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.android.support:recyclerview-v7:25.0.1'
-    compile 'com.android.support:customtabs:25.0.1'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'com.android.support:customtabs:25.1.0'
 
     compile 'com.jakewharton:butterknife:8.4.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
