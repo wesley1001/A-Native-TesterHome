@@ -100,6 +100,15 @@ public class TopicReplyAdapter extends BaseAdapter<TopicReplyEntity> {
                     }
                 }
             });
+
+            holder.replyLike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // obj_type: reply
+                    // obj_id: id
+                    mListener.onReplyLikeClick(topicReplyEntity.getId());
+                }
+            });
         } else {
             DeleteFloorHolder holder = (DeleteFloorHolder) viewHolder;
             holder.topicItemBody.setText("该楼层已被删除");
@@ -121,9 +130,11 @@ public class TopicReplyAdapter extends BaseAdapter<TopicReplyEntity> {
         void onListEnded();
 
         void onReplyClick(String replyInfo);
+
+        void onReplyLikeClick(int replyId);
     }
 
-    public static class ReplyViewHolder extends RecyclerView.ViewHolder {
+    static class ReplyViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_praise_reply_layout)
         LinearLayout praiseReplyLayout;
@@ -136,26 +147,29 @@ public class TopicReplyAdapter extends BaseAdapter<TopicReplyEntity> {
         @BindView(R.id.id_topic_time)
         TextView topicTime;
 
+        @BindView(R.id.tv_reply_like)
+        TextView replyLike;
+
         @BindView(R.id.id_user_avatar)
         SimpleDraweeView userAvatar;
 
         @BindView(R.id.tv_reply_to_reply)
         TextView mToReply;
 
-        public ReplyViewHolder(View itemView) {
+        ReplyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
     }
 
-    public static class DeleteFloorHolder extends RecyclerView.ViewHolder {
+    static class DeleteFloorHolder extends RecyclerView.ViewHolder {
 
 
         @BindView(R.id.id_topic_item_content)
         TextView topicItemBody;
 
-        public DeleteFloorHolder(View itemView) {
+        DeleteFloorHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

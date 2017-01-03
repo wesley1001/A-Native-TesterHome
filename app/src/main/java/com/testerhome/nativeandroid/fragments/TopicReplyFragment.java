@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.testerhome.nativeandroid.R;
@@ -13,6 +14,7 @@ import com.testerhome.nativeandroid.models.TopicReplyEntity;
 import com.testerhome.nativeandroid.models.TopicReplyResponse;
 import com.testerhome.nativeandroid.models.UserEntity;
 import com.testerhome.nativeandroid.networks.RestAdapterUtils;
+import com.testerhome.nativeandroid.oauth2.AuthenticationService;
 import com.testerhome.nativeandroid.utils.StringUtils;
 import com.testerhome.nativeandroid.views.adapters.TopicReplyAdapter;
 import com.testerhome.nativeandroid.views.widgets.DividerItemDecoration;
@@ -37,7 +39,7 @@ public class TopicReplyFragment extends BaseFragment {
 
     private int mNextCursor = 0;
 
-    private TopicReplyAdapter mAdatper;
+    private TopicReplyAdapter replyAdapter;
     private String mTopicId;
 
     public static TopicReplyFragment newInstance(String id, ReplyUpdateListener listener) {
@@ -64,8 +66,8 @@ public class TopicReplyFragment extends BaseFragment {
     @Override
     protected void setupView() {
 
-        mAdatper = new TopicReplyAdapter(getActivity());
-        mAdatper.setListener(new TopicReplyAdapter.TopicReplyListener() {
+        replyAdapter = new TopicReplyAdapter(getActivity());
+        replyAdapter.setListener(new TopicReplyAdapter.TopicReplyListener() {
             @Override
             public void onListEnded() {
                 if (mNextCursor > 0) {
@@ -77,6 +79,11 @@ public class TopicReplyFragment extends BaseFragment {
             public void onReplyClick(String replyInfo) {
                 mReplyUpdateListener.updateReplyTo(replyInfo);
             }
+
+            @Override
+            public void onReplyLikeClick(int replyId) {
+                replyLikeClick(replyId + "");
+            }
         });
         swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light,
                 android.R.color.holo_red_light,
@@ -86,7 +93,7 @@ public class TopicReplyFragment extends BaseFragment {
         recyclerViewTopicList.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewTopicList.addItemDecoration(new DividerItemDecoration(getActivity(),
                 DividerItemDecoration.VERTICAL_LIST));
-        recyclerViewTopicList.setAdapter(mAdatper);
+        recyclerViewTopicList.setAdapter(replyAdapter);
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             mNextCursor = 0;
@@ -94,13 +101,40 @@ public class TopicReplyFragment extends BaseFragment {
         });
     }
 
+    private TesterUser mCurrentUser;
+    private void replyLikeClick(String replyId){
+
+        if (mCurrentUser == null) {
+            mCurrentUser = TesterHomeAccountService.getInstance(getContext()).getActiveAccountInfo();
+
+            if (!TextUtils.isEmpty(mCurrentUser.getRefresh_token())
+                    && mCurrentUser.getExpireDate() <= System.currentTimeMillis()) {
+                AuthenticationService.refreshToken(getContext(),
+                        mCurrentUser.getRefresh_token());
+            }
+        }
+
+        mSubscription = RestAdapterUtils.getRestAPI(getContext())
+                .praiseTopic("reply", replyId, mCurrentUser.getAccess_token())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(response->{
+                    // TODO: update detail like count
+
+                }, error->{
+
+                });
+
+    }
+
+
     public void refreshReply(){
         loadTopicReplies(true);
     }
 
 
     public void updateReplyInfo(String content) {
-        if (mAdatper.getItemCount() < 20) {
+        if (replyAdapter.getItemCount() < 20) {
             content = "<p>" + content + "</p>";
             content = content.concat("\n\n").concat("<p>—— 来自TesterHome官方 <a href=\"http://fir.im/p9vs\" target=\"_blank\">安卓客户端</a></p>");
             TesterUser mTesterHomeAccount = TesterHomeAccountService.getInstance(getActivity()).getActiveAccountInfo();
@@ -120,7 +154,7 @@ public class TopicReplyFragment extends BaseFragment {
             topicReplyEntity.setUser(userEntity);
             List<TopicReplyEntity> topicReplyEntities = new ArrayList<>();
             topicReplyEntities.add(topicReplyEntity);
-            mAdatper.addItems(topicReplyEntities);
+            replyAdapter.addItems(topicReplyEntities);
         }
 
 
@@ -166,9 +200,9 @@ public class TopicReplyFragment extends BaseFragment {
                         }
                         if (response!=null && response.getTopicReply().size() > 0) {
                             if (mNextCursor == 0) {
-                                mAdatper.setItems(response.getTopicReply());
+                                replyAdapter.setItems(response.getTopicReply());
                             } else {
-                                mAdatper.addItems(response.getTopicReply());
+                                replyAdapter.addItems(response.getTopicReply());
                             }
 
                             if (response.getTopicReply().size() == 20) {
@@ -185,7 +219,7 @@ public class TopicReplyFragment extends BaseFragment {
     }
 
     public void scrollToEnd() {
-        recyclerViewTopicList.scrollToPosition(mAdatper.getItemCount());
+        recyclerViewTopicList.scrollToPosition(replyAdapter.getItemCount());
     }
 
     public interface ReplyUpdateListener{
