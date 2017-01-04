@@ -25,22 +25,22 @@ import zhou.widget.RichText;
  */
 public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
 
-
     private final int VIEW_SINGLE_ITEM = 1;
     private final int VIEW_DELETE_ITEM = 0;
     private final int VIEW_ITEM = 2;
+
     public static String TAG = "NotificationAdapter";
+
     public NotificationAdapter(Context context) {
         super(context);
-
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mItems.get(position).getActor() == null){
+        if (mItems.get(position).getActor() == null) {
             return VIEW_DELETE_ITEM;
         }
-        switch (mItems.get(position).getType()){
+        switch (mItems.get(position).getType()) {
             case Config.FOLLOW:
             case Config.TOPIC:
                 return VIEW_SINGLE_ITEM;
@@ -55,9 +55,9 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
-        switch (viewType){
+        switch (viewType) {
             case VIEW_ITEM:
-                view = View.inflate(parent.getContext(), R.layout.list_item_notification,null);
+                view = View.inflate(parent.getContext(), R.layout.list_item_notification, null);
                 return new NotificationHolder(view);
             case VIEW_SINGLE_ITEM:
                 view = View.inflate(parent.getContext(), R.layout.list_single_item_notification, null);
@@ -75,24 +75,25 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
 
         String userName;
 
-        switch (getItemViewType(position)){
+        switch (getItemViewType(position)) {
             case VIEW_ITEM:
-                NotificationHolder holder = (NotificationHolder)viewHolder;
+                NotificationHolder holder = (NotificationHolder) viewHolder;
                 holder.notification = mItems.get(position);
 
 
                 holder.userAvatar.setImageURI(Uri.parse(Config.getImageUrl(holder.notification.getActor().getAvatar_url())));
                 userName = holder.notification.getActor().getLogin();
                 if (holder.notification.getType().equals(Config.MENTION)) {
-                    holder.notificationTitle.setText(ToDBC(userName + " 在帖子 *** 提及你:"));
+                    holder.notificationTitle.setText(ToDBC(userName + " 在帖子 " + mItems.get(position).getTopic().getTitle() + " 提及你:"));
 
                     String html = holder.notification.getMention().getBody_html();
                     html = html.replaceAll("src=\"/photo", "src=\"https://testerhome.com/photo");
                     html = html.replaceAll("src=\"/", "src=\"https://testerhome.com/");
-                    html = html.replaceAll("/2/svg/", "/2/72x72/").replace(".svg", ".png");;
+                    html = html.replaceAll("/2/svg/", "/2/72x72/").replace(".svg", ".png");
+                    ;
                     holder.notificationBody.setRichText(html);
-                }else {
-                    holder.notificationTitle.setText(ToDBC(userName + " 在帖子 *** 回复了:"));
+                } else {
+                    holder.notificationTitle.setText(ToDBC(userName + " 在帖子 " + mItems.get(position).getTopic().getTitle() + " 回复了:"));
                     String html = holder.notification.getReply().getBody_html();
                     html = html.replaceAll("src=\"/photo", "src=\"https://testerhome.com/photo");
                     html = html.replaceAll("src=\"/", "src=\"https://testerhome.com/");
@@ -102,18 +103,18 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
                 }
                 holder.mNotificationRow.setOnClickListener(
                         v -> mContext.startActivity(new Intent(mContext, TopicDetailActivity.class)
-                                    .putExtra("topic", mItems.get(position).getTopic())
-                    ));
+                                .putExtra("topic", mItems.get(position).getTopic())
+                        ));
                 break;
             case VIEW_SINGLE_ITEM:
-                NotificationSingleHolder singleHolder = (NotificationSingleHolder)viewHolder;
+                NotificationSingleHolder singleHolder = (NotificationSingleHolder) viewHolder;
                 singleHolder.notification = mItems.get(position);
                 userName = singleHolder.notification.getActor().getLogin();
                 singleHolder.notification = mItems.get(position);
                 singleHolder.userAvatar.setImageURI(Uri.parse(Config.getImageUrl(singleHolder.notification.getActor().getAvatar_url())));
                 if (singleHolder.notification.getType().equals(Config.FOLLOW)) {
                     singleHolder.notificationTitle.setText(ToDBC(userName + mContext.getResources().getString(R.string.follow)));
-                }else{
+                } else {
                     singleHolder.notificationTitle.setText(ToDBC(userName + "创建了一个新的帖子"));
                 }
                 break;
@@ -178,7 +179,7 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
         void onListEnded();
     }
 
-    static class NotificationHolder extends RecyclerView.ViewHolder{
+    private static class NotificationHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_user_avatar)
         SimpleDraweeView userAvatar;
@@ -201,7 +202,7 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
     }
 
 
-    static class DeleteFloorHolder extends RecyclerView.ViewHolder {
+    private static class DeleteFloorHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_topic_item_content)
         TextView topicItemBody;
@@ -213,7 +214,7 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
     }
 
 
-    static class NotificationSingleHolder extends RecyclerView.ViewHolder{
+    private static class NotificationSingleHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_user_avatar)
         SimpleDraweeView userAvatar;
@@ -229,16 +230,14 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
         }
     }
 
-
-
-
     private static String ToDBC(String input) {
         char[] c = input.toCharArray();
-        for (int i = 0; i< c.length; i++) {
+        for (int i = 0; i < c.length; i++) {
             if (c[i] == 12288) {
                 c[i] = (char) 32;
                 continue;
-            }if (c[i]> 65280&& c[i]< 65375)
+            }
+            if (c[i] > 65280 && c[i] < 65375)
                 c[i] = (char) (c[i] - 65248);
         }
         return new String(c);
