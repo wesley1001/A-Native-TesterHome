@@ -32,7 +32,7 @@ public class AccountNotificationFragment extends BaseFragment {
 
     private int mNextCursor = 0;
 
-    private NotificationAdapter mAdatper;
+    private NotificationAdapter notificationAdapter;
 
 
     public static AccountNotificationFragment newInstance() {
@@ -57,27 +57,21 @@ public class AccountNotificationFragment extends BaseFragment {
 
     @Override
     protected void setupView() {
-        mAdatper = new NotificationAdapter(getActivity());
-        mAdatper.setListener(new NotificationAdapter.EndlessListener() {
-            @Override
-            public void onListEnded() {
-                if (mNextCursor > 0) {
-                    loadNotification(false);
-                }
+        notificationAdapter = new NotificationAdapter(getActivity());
+        notificationAdapter.setListener(() -> {
+            if (mNextCursor > 0) {
+                loadNotification(false);
             }
         });
         swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light, android.R.color.holo_red_light, android.R.color.holo_orange_light, android.R.color.holo_green_light);
         recyclerViewTopicList.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewTopicList.addItemDecoration(new DividerItemDecoration(getActivity(),
                 DividerItemDecoration.VERTICAL_LIST));
-        recyclerViewTopicList.setAdapter(mAdatper);
+        recyclerViewTopicList.setAdapter(notificationAdapter);
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mNextCursor = 0;
-                loadNotification(false);
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            mNextCursor = 0;
+            loadNotification(false);
         });
 
 
@@ -94,8 +88,8 @@ public class AccountNotificationFragment extends BaseFragment {
         if (showloading)
             showEmptyView();
 
-        RestAdapterUtils.getRestAPI(getActivity()).getNotifications(mTesterHomeAccount.getAccess_token(),
-                mNextCursor * 20)
+        RestAdapterUtils.getRestAPI(getActivity())
+                .getNotifications(mTesterHomeAccount.getAccess_token(), mNextCursor * 20)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<NotificationResponse>() {
@@ -122,9 +116,9 @@ public class AccountNotificationFragment extends BaseFragment {
                             }
                             if (notificationResponse.getNotifications().size() > 0) {
                                 if (mNextCursor == 0) {
-                                    mAdatper.setItems(notificationResponse.getNotifications());
+                                    notificationAdapter.setItems(notificationResponse.getNotifications());
                                 } else {
-                                    mAdatper.addItems(notificationResponse.getNotifications());
+                                    notificationAdapter.addItems(notificationResponse.getNotifications());
                                 }
                                 if (notificationResponse.getNotifications().size() == 20) {
                                     mNextCursor += 1;

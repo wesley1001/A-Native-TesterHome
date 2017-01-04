@@ -15,6 +15,8 @@ public class NotificationEntity {
     private String created_at;
     private String updated_at;
 
+    private TopicEntity topic;
+
 
     public MentionEntity getMention() {
         return mention;
@@ -86,5 +88,13 @@ public class NotificationEntity {
 
     public void setUpdated_at(String updated_at) {
         this.updated_at = updated_at;
+    }
+
+    public TopicEntity getTopic() {
+        return topic;
+    }
+
+    public void setTopic(TopicEntity topic) {
+        this.topic = topic;
     }
 }

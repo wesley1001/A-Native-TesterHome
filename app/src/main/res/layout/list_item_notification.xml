@@ -2,42 +2,41 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:id="@+id/notification_item_row"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="10dip">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/id_user_avatar"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        fresco:roundAsCircle="true"
-        fresco:roundedCornerRadius="180dp"
         fresco:actualImageScaleType="focusCrop"
-        />
+        fresco:roundAsCircle="true"
+        fresco:roundedCornerRadius="180dp" />
+
     <TextView
         android:id="@+id/id_notification_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/id_user_avatar"
-        android:layout_toRightOf="@+id/id_user_avatar"
         android:layout_marginLeft="10dip"
+        android:layout_toRightOf="@+id/id_user_avatar"
         android:maxLines="2"
         android:minLines="2"
-        tools:text="chenhengjie 在帖子 TesterHome native app 登陆授权介绍 回复了："
-        android:textSize="14sp"/>
+        android:textSize="14sp"
+        tools:text="chenhengjie 在帖子 TesterHome native app 登陆授权介绍 回复了：" />
 
     <zhou.widget.RichText
         android:id="@+id/id_notification_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/id_notification_title"
-        android:layout_toRightOf="@+id/id_user_avatar"
         android:layout_marginLeft="10dip"
         android:layout_marginTop="5dip"
-        tools:text="不错啊！大神"
+        android:layout_toRightOf="@+id/id_user_avatar"
         android:textSize="17sp"
-        />
-
+        tools:text="不错啊！大神" />
 
 </RelativeLayout>
