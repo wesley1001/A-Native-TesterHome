@@ -89,11 +89,15 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
 
                     String html = holder.notification.getMention().getBody_html();
                     html = html.replaceAll("src=\"/photo", "src=\"https://testerhome.com/photo");
+                    html = html.replaceAll("src=\"/", "src=\"https://testerhome.com/");
+                    html = html.replaceAll("/2/svg/", "/2/72x72/").replace(".svg", ".png");;
                     holder.notificationBody.setRichText(html);
                 }else {
                     holder.notificationTitle.setText(ToDBC(userName + " 在帖子 *** 回复了:"));
                     String html = holder.notification.getReply().getBody_html();
                     html = html.replaceAll("src=\"/photo", "src=\"https://testerhome.com/photo");
+                    html = html.replaceAll("src=\"/", "src=\"https://testerhome.com/");
+                    html = html.replaceAll("/2/svg/", "/2/72x72/").replace(".svg", ".png");
                     holder.notificationBody.setRichText(html);
 
                 }
