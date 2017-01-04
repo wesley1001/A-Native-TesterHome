@@ -1,1 +1,1 @@
-include ':app',':TesterHomeDaoGenerator'
+include ':app', ':TesterHomeDaoGenerator', ':swipebackhelper'

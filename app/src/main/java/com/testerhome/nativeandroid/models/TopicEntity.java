@@ -1,13 +1,17 @@
 package com.testerhome.nativeandroid.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.testerhome.nativeandroid.views.adapters.TopicsListAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Bin Li on 2015/9/15.
  */
-public class TopicEntity {
+public class TopicEntity implements Parcelable {
 
     /**
      * id : 3339
@@ -159,4 +163,58 @@ public class TopicEntity {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.title);
+        dest.writeString(this.created_at);
+        dest.writeString(this.updated_at);
+        dest.writeString(this.replied_at);
+        dest.writeInt(this.replies_count);
+        dest.writeString(this.node_name);
+        dest.writeInt(this.node_id);
+        dest.writeInt(this.last_reply_user_id);
+        dest.writeString(this.last_reply_user_login);
+        dest.writeParcelable(this.user, flags);
+        dest.writeByte(deleted ? (byte) 1 : (byte) 0);
+        dest.writeParcelable(this.abilities, flags);
+        dest.writeInt(this.type);
+        dest.writeList(this.banners);
+    }
+
+    protected TopicEntity(Parcel in) {
+        this.id = in.readString();
+        this.title = in.readString();
+        this.created_at = in.readString();
+        this.updated_at = in.readString();
+        this.replied_at = in.readString();
+        this.replies_count = in.readInt();
+        this.node_name = in.readString();
+        this.node_id = in.readInt();
+        this.last_reply_user_id = in.readInt();
+        this.last_reply_user_login = in.readString();
+        this.user = in.readParcelable(UserEntity.class.getClassLoader());
+        this.deleted = in.readByte() != 0;
+        this.abilities = in.readParcelable(AbilitiesEntity.class.getClassLoader());
+        this.type = in.readInt();
+        this.banners = new ArrayList<BannerEntity>();
+        in.readList(this.banners, BannerEntity.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<TopicEntity> CREATOR = new Parcelable.Creator<TopicEntity>() {
+        @Override
+        public TopicEntity createFromParcel(Parcel source) {
+            return new TopicEntity(source);
+        }
+
+        @Override
+        public TopicEntity[] newArray(int size) {
+            return new TopicEntity[size];
+        }
+    };
 }

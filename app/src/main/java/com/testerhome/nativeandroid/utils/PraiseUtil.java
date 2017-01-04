@@ -20,14 +20,11 @@ public class PraiseUtil {
 
     public static void delPraise(Context context, String topicId){
         DBManager.getInstance(context).getUserPraiseHistory().deleteByKey(topicId);
-        Toast.makeText(context, "取消点赞", Toast.LENGTH_SHORT).show();
     }
 
     public static void addPraise(Context context, TopicEntity topicEntity){
         UserPraiseHistoryDao userPraiseHistoryDao = DBManager.getInstance(context).getUserPraiseHistory();
 
         userPraiseHistoryDao.insert(new UserPraiseHistory(topicEntity.getId(), topicEntity.getUser().getId()));
-
-        Toast.makeText(context, "点赞成功！", Toast.LENGTH_SHORT).show();
     }
 }

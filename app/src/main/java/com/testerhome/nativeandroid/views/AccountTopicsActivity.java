@@ -10,19 +10,20 @@ import com.testerhome.nativeandroid.views.base.BackBaseActivity;
  * Created by vclub on 15/10/14.
  */
 public class AccountTopicsActivity extends BackBaseActivity {
+    private String loginName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_topics);
 
         setCustomTitle("我的发帖");
-
+        loginName = getIntent().getStringExtra("loginName");
         setupView();
     }
 
     private void setupView() {
         getSupportFragmentManager().beginTransaction().replace(R.id.container,
-                AccountTopicsFragment.newInstance())
+                AccountTopicsFragment.newInstance(loginName))
                 .commit();
     }
 }

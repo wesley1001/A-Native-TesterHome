@@ -22,7 +22,7 @@ public class FavoriteUtil {
 
     public static void delFavorite(Context context, String topicId){
         DBManager.getInstance(context).getFavoriteDao().deleteByKey(topicId);
-        Toast.makeText(context, "取消收藏！", Toast.LENGTH_SHORT).show();
+
     }
 
     public static void addTopicToFavorite(Context context, TopicEntity topicEntity) {
@@ -31,7 +31,7 @@ public class FavoriteUtil {
                 topicEntity.getTitle(), topicEntity.getCreated_at(), topicEntity.getNode_name(), topicEntity.getUser().getId(),
                 topicEntity.getUser().getLogin(), topicEntity.getUser().getName(), topicEntity.getUser().getAvatar_url()));
 
-        Toast.makeText(context, "收藏成功！", Toast.LENGTH_SHORT).show();
+
     }
 
     public static List<Favorite> getFavorites(Context context) {

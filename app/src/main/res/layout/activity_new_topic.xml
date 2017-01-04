@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:elevation="@dimen/default_elevation"
+                app:contentInsetEnd="?attr/actionBarSize"
+                app:theme="@style/AppTheme.AppBarOverlay"
+                 />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingLeft="16dp"
+                android:paddingEnd="16dp"
+                android:paddingRight="16dp"
+                android:background="?attr/widgetBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:text="@string/send_to_type"
+                    android:textColor="@color/bg_second_normal"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/new_topic_spn_tab"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:entries="@array/tabs"
+                    android:popupBackground="?attr/widgetBackground"/>
+
+            </LinearLayout>
+
+            <View style="@style/AppWidget.DeepLine" />
+
+            <EditText
+                android:id="@+id/new_topic_edt_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:hint="帖子名称"
+                android:background="?attr/widgetBackground" />
+
+            <View style="@style/AppWidget.DeepLine" />
+
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:background="?attr/widgetBackground">
+
+            <include layout="@layout/activity_editor_bar" />
+
+        </HorizontalScrollView>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <EditText
+            android:id="@+id/new_topic_edt_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="96dp"
+            android:gravity="start"
+            android:hint="请输入内容"
+            android:textSize="16sp"
+            android:minLines="30"
+            android:background="?attr/widgetBackgroundDark" />
+
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.design.widget.CoordinatorLayout>

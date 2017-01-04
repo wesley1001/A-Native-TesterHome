@@ -10,39 +10,38 @@ import com.testerhome.nativeandroid.R;
 import com.testerhome.nativeandroid.auth.TesterHomeAccountService;
 import com.testerhome.nativeandroid.models.NotificationResponse;
 import com.testerhome.nativeandroid.models.TesterUser;
-import com.testerhome.nativeandroid.networks.TesterHomeApi;
+import com.testerhome.nativeandroid.networks.RestAdapterUtils;
 import com.testerhome.nativeandroid.views.adapters.NotificationAdapter;
 import com.testerhome.nativeandroid.views.widgets.DividerItemDecoration;
 
-import butterknife.Bind;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import butterknife.BindView;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by cvtpc on 2015/10/18.
  */
 public class AccountNotificationFragment extends BaseFragment {
 
-    @Bind(R.id.rv_topic_list)
+    @BindView(R.id.rv_list)
     RecyclerView recyclerViewTopicList;
 
-    @Bind(R.id.srl_refresh)
+    @BindView(R.id.srl_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
 
     private int mNextCursor = 0;
 
-    private NotificationAdapter mAdatper;
+    private NotificationAdapter notificationAdapter;
 
 
     public static AccountNotificationFragment newInstance() {
-        AccountNotificationFragment fragment = new AccountNotificationFragment();
-        return fragment;
+        return new AccountNotificationFragment();
     }
 
     @Override
     protected int getLayoutRes() {
-        return R.layout.fragment_topics;
+        return R.layout.fragment_base_recycler;
     }
 
     @Override
@@ -58,27 +57,21 @@ public class AccountNotificationFragment extends BaseFragment {
 
     @Override
     protected void setupView() {
-        mAdatper = new NotificationAdapter(getActivity());
-        mAdatper.setListener(new NotificationAdapter.EndlessListener() {
-            @Override
-            public void onListEnded() {
-                if (mNextCursor > 0) {
-                    loadNotification(false);
-                }
+        notificationAdapter = new NotificationAdapter(getActivity());
+        notificationAdapter.setListener(() -> {
+            if (mNextCursor > 0) {
+                loadNotification(false);
             }
         });
         swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light, android.R.color.holo_red_light, android.R.color.holo_orange_light, android.R.color.holo_green_light);
         recyclerViewTopicList.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewTopicList.addItemDecoration(new DividerItemDecoration(getActivity(),
                 DividerItemDecoration.VERTICAL_LIST));
-        recyclerViewTopicList.setAdapter(mAdatper);
+        recyclerViewTopicList.setAdapter(notificationAdapter);
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mNextCursor = 0;
-                loadNotification(false);
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            mNextCursor = 0;
+            loadNotification(false);
         });
 
 
@@ -93,43 +86,55 @@ public class AccountNotificationFragment extends BaseFragment {
 
     private void loadNotification(boolean showloading) {
         if (showloading)
-            showLoadingView();
-        TesterHomeApi.getInstance().getTopicsService().getNotifications(mTesterHomeAccount.getAccess_token(),
-                mNextCursor * 20,
-                new Callback<NotificationResponse>() {
-                    @Override
-                    public void success(NotificationResponse notificationResponse, Response response) {
-                        hideLoadingView();
-                        if (swipeRefreshLayout.isRefreshing()) {
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                        if (notificationResponse.getNotifications().size() > 0) {
-                            if (mNextCursor == 0) {
-                                mAdatper.setItems(notificationResponse.getNotifications());
-                            } else {
-                                mAdatper.addItems(notificationResponse.getNotifications());
-                            }
-                            if (notificationResponse.getNotifications().size() == 20) {
-                                mNextCursor += 1;
-                            } else {
-                                mNextCursor = 0;
-                            }
+            showEmptyView();
 
-                        } else {
-                            mNextCursor = 0;
-                        }
+        RestAdapterUtils.getRestAPI(getActivity())
+                .getNotifications(mTesterHomeAccount.getAccess_token(), mNextCursor * 20)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<NotificationResponse>() {
+                    @Override
+                    public void onCompleted() {
+
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
-                        hideLoadingView();
+                    public void onError(Throwable t) {
+                        hideEmptyView();
                         if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                             swipeRefreshLayout.setRefreshing(false);
                         }
-                        Log.e("demo", "failure() called with: " + "error = [" + error + "]"
-                                + error.getUrl());
+                        Log.e("demo", "failure() called with: " + "error = [" + t.getMessage() + "]", t);
+                    }
+
+                    @Override
+                    public void onNext(NotificationResponse notificationResponse) {
+                        if (notificationResponse != null) {
+                            hideEmptyView();
+                            if (swipeRefreshLayout !=null && swipeRefreshLayout.isRefreshing()) {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                            if (notificationResponse.getNotifications().size() > 0) {
+                                if (mNextCursor == 0) {
+                                    notificationAdapter.setItems(notificationResponse.getNotifications());
+                                } else {
+                                    notificationAdapter.addItems(notificationResponse.getNotifications());
+                                }
+                                if (notificationResponse.getNotifications().size() == 20) {
+                                    mNextCursor += 1;
+                                } else {
+                                    mNextCursor = 0;
+                                }
+
+                            } else {
+                                mNextCursor = 0;
+                            }
+                        }
                     }
                 });
+
+
+
     }
 
 

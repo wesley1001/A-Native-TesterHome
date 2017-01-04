@@ -5,14 +5,12 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.testerhome.nativeandroid.R;
 import com.testerhome.nativeandroid.fragments.SettingsFragment;
-import com.umeng.analytics.MobclickAgent;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -21,12 +19,12 @@ import butterknife.ButterKnife;
 public abstract class BaseActivity extends AppCompatActivity {
 
     @Nullable
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     protected
     Toolbar toolbar;
 
     @Nullable
-    @Bind(R.id.toolbar_title)
+    @BindView(R.id.toolbar_title)
     TextView customTitle;
 
     @Override
@@ -41,15 +39,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public boolean enableTheme(){
-        return false;
+        return true;
     }
 
     private void loadTheme(){
-        if (PreferenceManager.getDefaultSharedPreferences(this).getString(SettingsFragment.KEY_PREF_THEME, "0").equals("1")) {
-            Log.e("theme", "is dark theme");
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SettingsFragment.KEY_PREF_THEME, false)) {
             setTheme(R.style.theme_dark);
         } else {
-            Log.e("theme", "is light theme");
             setTheme(R.style.theme_light);
         }
     }
@@ -74,21 +70,4 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ButterKnife.unbind(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        MobclickAgent.onResume(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        MobclickAgent.onResume(this);
-    }
 }

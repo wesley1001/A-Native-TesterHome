@@ -10,13 +10,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.testerhome.nativeandroid.views.UserLoginActivity;
+import com.testerhome.nativeandroid.views.AuthActivity;
 
 /**
  * Created by vclub on 15/10/13.
  */
 public class UserAccountAuthenticator extends AbstractAccountAuthenticator {
-    private String _tag = "UserAccountAuthenticator";
+    private String _tag = "UAAuthenticator";
     private Context _context;
 
     public UserAccountAuthenticator(Context context) {
@@ -34,7 +34,7 @@ public class UserAccountAuthenticator extends AbstractAccountAuthenticator {
         Log.d(_tag, accountType + " - " + authTokenType);
         Bundle ret = new Bundle();
 
-        Intent intent = new Intent(_context, UserLoginActivity.class);
+        Intent intent = new Intent(_context, AuthActivity.class);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
 
         ret.putParcelable(AccountManager.KEY_INTENT, intent);

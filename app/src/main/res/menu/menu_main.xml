@@ -1,11 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".MainActivity">
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/abc_ic_search"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="always" />
+        android:imeOptions="actionSearch"
+        android:inputType="textCapWords"
+        android:title="@string/action_search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView"/>
 </menu>

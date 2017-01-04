@@ -3,7 +3,6 @@ package com.testerhome.nativeandroid.views.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,15 +19,16 @@ import com.testerhome.nativeandroid.Config;
 import com.testerhome.nativeandroid.R;
 import com.testerhome.nativeandroid.models.TopicEntity;
 import com.testerhome.nativeandroid.models.ToutiaoResponse;
-import com.testerhome.nativeandroid.networks.TesterHomeApi;
+import com.testerhome.nativeandroid.networks.RestAdapterUtils;
+import com.testerhome.nativeandroid.utils.DeviceUtil;
 import com.testerhome.nativeandroid.utils.StringUtils;
 import com.testerhome.nativeandroid.views.TopicDetailActivity;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Bin Li on 2015/9/16.
@@ -40,6 +39,7 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
     public static final int TOPIC_LIST_TYPE_TOPIC = 1;
     private Context context;
     private View[] imageViews;
+
     public TopicsListAdapter(Context context) {
         super(context);
         this.context = context;
@@ -52,7 +52,12 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
         switch (viewType) {
             case TOPIC_LIST_TYPE_BANNER:
                 view = LayoutInflater.from(mContext).inflate(R.layout.list_item_banner, parent, false);
-                ViewGroup viewGroup = (ViewGroup)view.findViewById(R.id.view_group);
+                ViewGroup.LayoutParams bannerLayoutParams = view.findViewById(R.id.banner_layout).getLayoutParams();
+                bannerLayoutParams.width = DeviceUtil.getDeviceWidth(mContext);
+                bannerLayoutParams.height = (bannerLayoutParams.width / 2);
+                view.findViewById(R.id.banner_layout).setLayoutParams(bannerLayoutParams);
+
+                ViewGroup viewGroup = (ViewGroup) view.findViewById(R.id.view_group);
                 loadToutiao(viewGroup);
                 return new TopicBannerViewHolder(view);
             default:
@@ -79,7 +84,7 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
                     mBannerAdapter = new TopicBannerAdapter();
                 }
                 bannerViewHolder.mTopicBanner.setAdapter(mBannerAdapter);
-
+                startPlayNext(bannerViewHolder.mTopicBanner);
                 mTopicBannerTitle = bannerViewHolder.mTopicBannerTitle;
                 break;
             default:
@@ -99,12 +104,13 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
                 holder.badgeView.setHideOnNull(false);
                 holder.badgeView.setBadgeCount(topic.getReplies_count());
                 holder.topicItem.setTag(topic.getId());
-                holder.topicItem.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String topicId = (String) v.getTag();
-                        mContext.startActivity(new Intent(mContext, TopicDetailActivity.class).putExtra("topic_id", topicId));
+                holder.topicItem.setOnClickListener(v -> {
+                    if (DeviceUtil.isFastClick()) {
+                        return;
                     }
+                    String topicId = (String) v.getTag();
+                    mContext.startActivity(new Intent(mContext, TopicDetailActivity.class)
+                            .putExtra("topic", topic));
                 });
                 break;
         }
@@ -112,6 +118,19 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
         if (position == mItems.size() - 1 && mListener != null) {
             mListener.onListEnded();
         }
+    }
+
+    private void startPlayNext(ViewPager banner){
+        banner.postDelayed(() -> {
+            int cur = banner.getCurrentItem() + 1;
+            if (cur>= banner.getAdapter().getCount()){
+                cur = 0;
+            }
+            banner.setCurrentItem(cur);
+
+            if (banner.getWindowToken() != null)
+                startPlayNext(banner);
+        }, 3000);
     }
 
     private EndlessListener mListener;
@@ -126,25 +145,25 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
 
     public class TopicItemViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.sdv_topic_user_avatar)
+        @BindView(R.id.sdv_topic_user_avatar)
         SimpleDraweeView topicUserAvatar;
 
-        @Bind(R.id.tv_topic_title)
+        @BindView(R.id.tv_topic_title)
         TextView textViewTopicTitle;
 
-        @Bind(R.id.tv_topic_username)
+        @BindView(R.id.tv_topic_username)
         TextView topicUsername;
 
-        @Bind(R.id.tv_topic_publish_date)
+        @BindView(R.id.tv_topic_publish_date)
         TextView topicPublishDate;
 
-        @Bind(R.id.tv_topic_name)
+        @BindView(R.id.tv_topic_name)
         TextView topicName;
 
-        @Bind(R.id.tv_topic_replies_count)
+        @BindView(R.id.tv_topic_replies_count)
         TextView topicRepliesCount;
 
-        @Bind(R.id.rl_topic_item)
+        @BindView(R.id.rl_topic_item)
         View topicItem;
 
         BadgeView badgeView;
@@ -159,10 +178,10 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
 
     public class TopicBannerViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.vp_topic_banner)
+        @BindView(R.id.vp_topic_banner)
         ViewPager mTopicBanner;
 
-        @Bind(R.id.tv_banner_title)
+        @BindView(R.id.tv_banner_title)
         TextView mTopicBannerTitle;
 
 
@@ -202,44 +221,55 @@ public class TopicsListAdapter extends BaseAdapter<TopicEntity> {
         }
     }
 
+    private static final String TAG = "TopicsListAdapter";
 
     // region
     private void loadToutiao(final ViewGroup viewGroup) {
-        TesterHomeApi.getInstance().getTopicsService().getToutiao(new Callback<ToutiaoResponse>() {
-            @Override
-            public void success(ToutiaoResponse toutiaoResponse, Response response) {
 
-                imageViews = new View[toutiaoResponse.getAds().size()];
-                for (int i = 0; i < imageViews.length; i++) {
-                    LinearLayout.LayoutParams margin = new LinearLayout.LayoutParams(
-                            30,
-                            3);
-                    margin.setMargins(10, 0, 0, 0);
-                    View imageView = new View(context);
-                    imageViews[i] = imageView;
-                    if (i == 0) {
-                        imageViews[i].setBackgroundResource(R.color.colorAccent);
-                    }else{
-                        imageViews[i].setBackgroundResource(R.color.tab_item_tint_default);
+        RestAdapterUtils.getRestAPI(mContext).getToutiao()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ToutiaoResponse>() {
+                    @Override
+                    public void onCompleted() {
+
                     }
-                    viewGroup.addView(imageViews[i], margin);
-                }
 
-                if (toutiaoResponse.getAds().size() > 0) {
-                    mBannerAdapter.setItems(toutiaoResponse.getAds());
-                    if (mBannerAdapter != null)
-                        mTopicBannerTitle.setText(mBannerAdapter.getPageTitle(0));
-                } else {
-                    // no info
-                }
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "onError: ", e);
+                    }
 
-            }
+                    @Override
+                    public void onNext(ToutiaoResponse toutiaoResponse) {
+                        if (toutiaoResponse != null) {
+                            imageViews = new View[toutiaoResponse.getAds().size()];
+                            for (int i = 0; i < imageViews.length; i++) {
+                                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT);
+                                layoutParams.weight = 1;
 
-            @Override
-            public void failure(RetrofitError error) {
-                Log.e("TopicsListAdapter", error.getMessage());
-            }
-        });
+                                View imageView = new View(context);
+                                imageViews[i] = imageView;
+                                if (i == 0) {
+                                    imageViews[i].setBackgroundResource(R.color.colorAccent);
+                                } else {
+                                    imageViews[i].setBackgroundResource(R.color.tab_item_tint_default);
+                                }
+                                viewGroup.addView(imageViews[i], layoutParams);
+                            }
+
+                            if (toutiaoResponse.getAds().size() > 0) {
+                                mBannerAdapter.setItems(toutiaoResponse.getAds());
+                                if (mBannerAdapter != null)
+                                    mTopicBannerTitle.setText(mBannerAdapter.getPageTitle(0));
+                            } else {
+                                // no info
+                            }
+                        }
+                    }
+                });
     }
     // endregion
 }

@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
+import android.webkit.CookieManager;
 
 import com.testerhome.nativeandroid.R;
 import com.testerhome.nativeandroid.models.OAuth;
@@ -84,8 +85,10 @@ public class TesterHomeAccountService {
     public TesterUser getActiveAccountInfo() {
         if (null != activeAccount)
             return getAccountInfo(activeAccount);
-        else
+        else {
             return new TesterUser();
+        }
+
     }
 
     public Account getActiveAccount() {
@@ -111,18 +114,20 @@ public class TesterHomeAccountService {
         return mAccountManager.getPassword(account);
     }
 
-    public boolean signIn(String username, String password, TesterUser user, OAuth oAuth) {
+    public boolean signIn(String username, TesterUser user, OAuth oAuth) {
 
         if (user == null) {
             return false;
         }
-        Account account = setActiveAccount(username, password);
+        Account account = setActiveAccount(username, oAuth.getAccess_token());
         setDefaultAccount(account);
 
-        user.setAccess_token(password);
+        user.setAccess_token(oAuth.getAccess_token());
         user.setRefresh_token(oAuth.getRefresh_token());
-        user.setExpireDate(oAuth.getExpires_in());
         user.setCreate_at(oAuth.getCraete_at());
+
+        long timeout = System.currentTimeMillis() + oAuth.getExpires_in() * 1000 - (6 * 60 * 60 * 1000);
+        user.setExpireDate(timeout);
         updateAccountInfo(account, user);
 
         return true;
@@ -144,6 +149,7 @@ public class TesterHomeAccountService {
 
         if (mAccountManager.getUserData(account,KEY_USER_DATA_REFRESH_TOKEN) != null) {
             user.setExpireDate(Long.valueOf(mAccountManager.getUserData(account, KEY_USER_DATA_EXPIRE_DATE)));
+            Log.d(TAG, "getAccountInfo timeout: " + user.getExpireDate());
             user.setRefresh_token(mAccountManager.getUserData(account, KEY_USER_DATA_REFRESH_TOKEN));
             user.setCreate_at(Long.valueOf(mAccountManager.getUserData(account, KEY_USER_DATA_CREATE_AT)));
         }
@@ -155,6 +161,7 @@ public class TesterHomeAccountService {
         updateAccountInfo(activeAccount, userProfile);
     }
 
+    private static final String TAG = "AccountService";
     public void updateAccountInfo(Account account, TesterUser userProfile) {
         mAccountManager.setUserData(account, KEY_USER_DATA_USER_ID, String.valueOf(userProfile.getId()));
         mAccountManager.setUserData(account, KEY_USER_DATA_ACCOUNT_NAME, userProfile.getLogin());
@@ -169,6 +176,7 @@ public class TesterHomeAccountService {
         mAccountManager.setUserData(account,KEY_USER_DATA_TAGLINE,userProfile.getTagline());
         if (userProfile.getRefresh_token() != null) {
             mAccountManager.setUserData(account, KEY_USER_DATA_EXPIRE_DATE, String.valueOf(userProfile.getExpireDate()));
+            Log.d(TAG, "updateAccountInfo timeout: " + userProfile.getExpireDate());
             mAccountManager.setUserData(account,KEY_USER_DATA_REFRESH_TOKEN,userProfile.getRefresh_token());
             mAccountManager.setUserData(account,KEY_USER_DATA_CREATE_AT,String.valueOf(userProfile.getCreate_at()));
         }
@@ -191,7 +199,8 @@ public class TesterHomeAccountService {
 
     public void updateAccountToken(OAuth oAuth){
         mAccountManager.setUserData(activeAccount, KEY_USER_DATA_TOKEN, oAuth.getAccess_token());
-        mAccountManager.setUserData(activeAccount, KEY_USER_DATA_EXPIRE_DATE, String.valueOf(oAuth.getExpires_in()));
+        long timeout = System.currentTimeMillis() + oAuth.getExpires_in() * 1000 - (6 * 60 * 60 * 1000);
+        mAccountManager.setUserData(activeAccount, KEY_USER_DATA_EXPIRE_DATE, String.valueOf(timeout));
         mAccountManager.setUserData(activeAccount,KEY_USER_DATA_REFRESH_TOKEN,oAuth.getRefresh_token());
         mAccountManager.setUserData(activeAccount,KEY_USER_DATA_CREATE_AT,String.valueOf(oAuth.getCraete_at()));
     }
@@ -202,6 +211,9 @@ public class TesterHomeAccountService {
             mAccountManager.removeAccount(account, null, null);
             spfHelper.remove(KEY_DEFAULT_ACCOUNT);
             activeAccount = null;
+
+            // clean cookie
+            CookieManager.getInstance().removeSessionCookie();
         }
     }
 

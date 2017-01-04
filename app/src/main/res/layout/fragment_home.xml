@@ -9,6 +9,7 @@
         android:id="@+id/tl_topics"
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundGeneral"
         app:tabMode="fixed"/>
 
     <android.support.v4.view.ViewPager
@@ -16,4 +17,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/tl_topics" />
+
 </RelativeLayout>

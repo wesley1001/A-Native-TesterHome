@@ -7,8 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.testerhome.nativeandroid.fragments.SettingsFragment;
+import com.testerhome.nativeandroid.views.base.BaseActivity;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
 
 
     @Override
@@ -27,6 +28,12 @@ public class SettingsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME |
                     ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
     }
+
+
+    public boolean enableTheme() {
+        return true;
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -15,7 +15,7 @@
         fresco:roundedCornerRadius="180dp"
         fresco:actualImageScaleType="focusCrop"
         />
-    <TextView
+    <zhou.widget.RichText
         android:id="@+id/id_notification_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

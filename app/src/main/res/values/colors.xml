@@ -8,11 +8,7 @@
     <color name="tab_item_tint_focused">#EA002A</color>
     <color name="tab_item_tint_default">#888888</color>
     <color name="white">#FFFFFF</color>
-    <color name="split_line">#F1F1F1</color>
-    <color name="itemPress">#E1E1E1</color>
-    <color name="defaultColor">#EEEEEE</color>
 
-    <color name="fab_color_pressed">#007787</color>
     <color name="fab_color_shadow">#44000000</color>
 
     <color name="btn_send_normal">#02c754</color>
@@ -29,4 +25,23 @@
     <color name="text_color_second_normal">#00ff00</color>
     <color name="bg_second_dark">#ffffff</color>
     <color name="text_color_second_dark">#222</color>
+    <color name="text_color_light">#b3ffffff</color>
+
+    <color name="error_view_text">#656565</color>
+    <color name="error_view_text_light">#858585</color>
+
+    <color name="error_view_retry_button_background">#30000000</color>
+    <color name="error_view_retry_button_background_stroke">#50000000</color>
+
+
+
+    <color name="selectable_item_background_general_light_normal">@android:color/white</color>
+    <color name="selectable_item_background_general_light_pressed">#ffeeeeee</color>
+    <color name="selectable_item_background_general_dark_normal">#ff3c3c3c</color>
+    <color name="selectable_item_background_general_dark_pressed">#ff444444</color>
+
+    <color name="material_grey_900">#ff212121</color>
+    <color name="material_grey_850">#ff303030</color>
+    <color name="material_grey_100">#fff5f5f5</color>
+    <color name="material_grey_50">#fffafafa</color>
 </resources>

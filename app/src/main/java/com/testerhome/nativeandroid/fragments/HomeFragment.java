@@ -5,11 +5,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 
 import com.testerhome.nativeandroid.Config;
 import com.testerhome.nativeandroid.R;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 /**
  * Created by vclub on 15/9/15.
@@ -17,10 +18,10 @@ import butterknife.Bind;
 public class HomeFragment extends BaseFragment {
 
 
-    @Bind(R.id.tl_topics)
+    @BindView(R.id.tl_topics)
     TabLayout tabLayoutTopicsTab;
 
-    @Bind(R.id.vp_topics)
+    @BindView(R.id.vp_topics)
     ViewPager viewPagerTopics;
 
     private TopicViewPagerAdapter mAdapter;
@@ -32,23 +33,20 @@ public class HomeFragment extends BaseFragment {
 
     @Override
     protected void setupView() {
-
-        mAdapter = new TopicViewPagerAdapter(getActivity().getSupportFragmentManager());
+        mAdapter = new TopicViewPagerAdapter(getChildFragmentManager());
         viewPagerTopics.setAdapter(mAdapter);
         viewPagerTopics.setOffscreenPageLimit(4);
 
         tabLayoutTopicsTab.setupWithViewPager(viewPagerTopics);
-        tabLayoutTopicsTab.setTabsFromPagerAdapter(mAdapter);
-
     }
 
     public class TopicViewPagerAdapter extends FragmentPagerAdapter {
 
-        private String[] typeName = {"最新","最热","沙发","精华"};
+        private String[] typeName = {"最新","精华","最热","沙发"};
         private String[] typeValue = {Config.TOPICS_TYPE_RECENT,
+                                        Config.TOPICS_TYPE_EXCELLENT,
                                         Config.TOPICS_TYPE_POPULAR,
-                                        Config.TOPICS_TYPE_NO_REPLY,
-                                        Config.TOPICS_TYPE_EXCELLENT};
+                                        Config.TOPICS_TYPE_NO_REPLY};
 
         public TopicViewPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -68,5 +66,11 @@ public class HomeFragment extends BaseFragment {
         public int getCount() {
             return typeName.length;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("homefragment","destroy");
     }
 }

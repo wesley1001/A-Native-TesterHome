@@ -8,7 +8,7 @@ public class TopicDetailEntity extends TopicEntity {
     private String body_html;
     private String body;
     private String hits;
-
+    private int likes_count;
 
     public String getBody() {
         return body;
@@ -32,5 +32,13 @@ public class TopicDetailEntity extends TopicEntity {
 
     public void setHits(String hits) {
         this.hits = hits;
+    }
+
+    public int getLikes_count() {
+        return likes_count;
+    }
+
+    public void setLikes_count(int likes_count) {
+        this.likes_count = likes_count;
     }
 }

@@ -5,15 +5,14 @@ package com.testerhome.nativeandroid.models;
  */
 public class UserDetailResponse {
 
+    private TesterUser user;
 
-        private TesterUser user_detail;
+    public TesterUser getUser() {
+        return user;
+    }
 
-        public TesterUser getUser() {
-            return user_detail;
-        }
-
-        public void setUser(TesterUser user) {
-            this.user_detail = user;
-        }
+    public void setUser(TesterUser user) {
+        this.user = user;
+    }
 
 }

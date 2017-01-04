@@ -2,7 +2,9 @@ package com.testerhome.nativeandroid.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 /**
@@ -29,5 +31,23 @@ public class DeviceUtil {
         // InputMethodManager.SHOW_FORCED);
         InputMethodManager imm = (InputMethodManager) ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+    }
+
+    private static long lastClickTime;
+    public synchronized static boolean isFastClick() {
+        long time = System.currentTimeMillis();
+        if ( time - lastClickTime < 500) {
+            return true;
+        }
+        lastClickTime = time;
+        return false;
+    }
+
+    public static int getDeviceWidth(Context context){
+        WindowManager wm = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        Point size = new Point();
+        wm.getDefaultDisplay().getSize(size);
+
+        return Math.min(size.x, size.y);
     }
 }

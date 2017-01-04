@@ -22,14 +22,47 @@
             app:layout_scrollFlags="scroll|enterAlwaysCollapsed"
             app:theme="@style/AppTheme.AppBarOverlay">
 
-            <TextView
-                android:id="@+id/toolbar_title"
-                style="@style/ActionbarTitleStyle"
-                android:layout_width="match_parent"
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/sdv_detail_user_avatar"
+                android:padding="5dp"
+                android:layout_width="?attr/actionBarSize"
                 android:layout_height="?attr/actionBarSize"
-                android:gravity="center"
-                android:singleLine="true"
-                tools:text="here is title" />
+                android:layout_alignParentRight="true"
+                app:placeholderImage="@mipmap/ic_launcher"
+                app:roundAsCircle="true" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/tv_detail_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_detail_title"
+                    android:textColor="@android:color/white"
+                    style="@style/TextAppearance.AppCompat.Caption"
+                    tools:text="node name." />
+
+                <TextView
+                    android:id="@+id/tv_detail_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_detail_title"
+                    android:layout_toRightOf="@+id/tv_detail_name"
+                    android:textColor="@android:color/white"
+                    style="@style/TextAppearance.AppCompat.Caption"
+                    tools:text="username•" />
+
+                <TextView
+                    android:id="@+id/tv_detail_publish_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_detail_name"
+                    android:textColor="@android:color/white"
+                    style="@style/TextAppearance.AppCompat.Caption"
+                    tools:text="datetime." />
+            </RelativeLayout>
         </android.support.v7.widget.Toolbar>
 
         <include
@@ -45,7 +78,7 @@
             android:layout_height="match_parent"
             app:tabSelectedTextColor="@android:color/white"
             app:tabTextColor="@android:color/darker_gray"
-            app:layout_scrollFlags="scroll|snap|enterAlways" />
+            />
     </android.support.design.widget.AppBarLayout>
 
 
@@ -64,7 +97,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
         android:src="@drawable/ic_discuss"
-        app:layout_anchor="@id/coordinatorLayout"
+        app:layout_anchor="@+id/view_pager"
         app:layout_anchorGravity="bottom|right|end"
         app:layout_behavior="@string/fab_scrolling_view_behavior" />
 
@@ -74,7 +107,7 @@
         android:layout_height="wrap_content"
         android:background="@color/bg_comments"
         android:elevation="@dimen/default_elevation"
-        app:layout_anchor="@id/coordinatorLayout"
+        app:layout_anchor="@+id/view_pager"
         app:layout_anchorGravity="bottom|end"
         android:gravity="center_vertical"
         android:paddingBottom="4dp"
@@ -100,7 +133,7 @@
             android:background="@drawable/btn_send_comment"
             android:elevation="4dp"
             android:orientation="vertical"
-            android:text="发送"
+            android:text="@string/send"
             android:textColor="@color/white"/>
 
     </LinearLayout>

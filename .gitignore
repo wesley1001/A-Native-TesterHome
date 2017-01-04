@@ -1,3 +1,4 @@
+/gradle.properties
 # Built application files
 *.apk
 *.ap_
@@ -28,3 +29,4 @@ proguard/
 *.log
 
 .idea/
+*.iml

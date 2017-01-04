@@ -7,43 +7,46 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_search">搜索</string>
 
     <string name="main_tab_home">社区</string>
+    <string name="main_tab_category">分类导航</string>
     <string name="main_tab_topic">话题</string>
     <string name="main_tab_job">招聘</string>
-    <string name="main_tab_my">我的</string>
-    <string name="reply_topic">回帖信息</string>
-    <string name="collect_topic">我收藏的帖子</string>
-    <string name="created_topic">我发表的帖子</string>
-    <string name="notification">通知</string>
-    <string name="company">公司:</string>
-    <string name="tag_line">签名:</string>
-    <string name="introduce">简介:</string>
-    <string name="follow">开始关注你了。</string>
-    <string name="action_topic_detail_share">分享</string>
-    <string name="logout">退出登录</string>
-    <string name="string_loading">Loading&#8230;</string>
+    <string name="main_tab_mooc">公开课</string>
+    <string name="main_tab_bugs">臭虫广播站</string>
 
-    <string name="reply_count_info">%s条回复</string>
-
+    <string name="main_drawer_wiki">Wiki</string>
     <string name="main_drawer_settings">设置</string>
     <string name="main_drawer_about">关于</string>
-    <string name="title_activity_settings">Settings</string>
+
+    <string name="follow">开始关注你了。</string>
+    <string name="action_topic_detail_share">分享</string>
+    <string name="action_topic_new">发表</string>
+    <string name="posting_$_">正在发布中&#8230;</string>
+    <string name="post_success">发布成功</string>
+    <string name="title_empty_error_tip">标题不能为空</string>
+    <string name="content_empty_error_tip">内容不能为空</string>
+    <string name="logout">注销</string>
+    <string name="string_loading">Loading&#8230;</string>
+    <string name="user_info_name">unKnow</string>
+    <string name="reply_count_info">%s条回复</string>
+
+
+    <string name="send">发送</string>
+    <string name="send_to_type">发布到分类:</string>
+    <string name="error_view_oops">Oops</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="title">标题</string>
+    <string name="add_link">添加连接</string>
+    <string name="link">连接</string>
+    <string name="http_$">http://</string>
 
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
 
-    <string name="pref_title_theme">主题样式</string>
-    <string-array name="pref_theme_list_titles">
-        <item>Light</item>
-        <item>Dark</item>
-    </string-array>
-    <string-array name="pref_theme_list_values">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
 
     <string name="fab_scrolling_view_behavior" translatable="false">com.testerhome.nativeandroid.views.widgets.ScrollAwareFABBehavior</string>
 </resources>

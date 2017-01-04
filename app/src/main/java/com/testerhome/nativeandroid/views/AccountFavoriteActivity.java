@@ -10,20 +10,21 @@ import com.testerhome.nativeandroid.views.base.BackBaseActivity;
  * Created by vclub on 15/10/14.
  */
 public class AccountFavoriteActivity extends BackBaseActivity {
+    private String loginName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_favorite);
 
         setCustomTitle("我的收藏");
-
+        loginName = getIntent().getStringExtra("loginName");
 
         setupView();
     }
 
     private void setupView() {
         getSupportFragmentManager().beginTransaction().replace(R.id.container,
-                AccountFavoriteFragment.newInstance())
+                AccountFavoriteFragment.newInstance(loginName))
                 .commit();
     }
 }

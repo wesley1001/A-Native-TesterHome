@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "465633047682",
+    "project_id": "testerhome-4f611"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465633047682:android:9612d6ad2e1d617d",
+        "android_client_info": {
+          "package_name": "com.testerhome.nativeandroid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqIlqQO0jxpUEh5_T4mY2a5P5plxajhAM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-45014075-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

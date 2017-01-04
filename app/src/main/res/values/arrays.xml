@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="tabs">
+        <item>新手区</item>
+        <item>灌水</item>
+        <item>Appium</item>
+        <item>移动基础测试</item>
+        <item>移动性能测试</item>
+    </string-array>
+
+    <string-array name="tab_value">
+        <item>36</item>
+        <item>11</item>
+        <item>23</item>
+        <item>33</item>
+        <item>32</item>
+    </string-array>
+
+</resources>

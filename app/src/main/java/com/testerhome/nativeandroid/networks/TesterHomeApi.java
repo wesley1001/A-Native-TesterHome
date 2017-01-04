@@ -1,10 +1,11 @@
 package com.testerhome.nativeandroid.networks;
 
-import com.testerhome.nativeandroid.BuildConfig;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.testerhome.nativeandroid.Config;
 
-import retrofit.RestAdapter;
-import retrofit.client.OkClient;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Bin Li on 2015/9/16.
@@ -15,22 +16,22 @@ public class TesterHomeApi {
     private TopicsService topicsService;
 
     public static TesterHomeApi getInstance() {
-        if (instance == null){
+        if (instance == null) {
             instance = new TesterHomeApi();
         }
         return instance;
     }
 
-    private TesterHomeApi(){
-        RestAdapter restAdapter = buildRestAdapter();
-        this.topicsService = restAdapter.create(TopicsService.class);
+    private TesterHomeApi() {
+        Retrofit retrofit = buildRestAdapter();
+        this.topicsService = retrofit.create(TopicsService.class);
     }
 
-    private RestAdapter buildRestAdapter() {
-        return new RestAdapter.Builder()
-                .setLogLevel(BuildConfig.DEBUG? RestAdapter.LogLevel.FULL: RestAdapter.LogLevel.NONE)
-                .setEndpoint(Config.BASE_URL)
-                .setClient(new OkClient())
+    private Retrofit buildRestAdapter() {
+        return new Retrofit.Builder()
+                .baseUrl(Config.BASE_URL)
+                .client(new OkHttpClient.Builder().addInterceptor(new StethoInterceptor()).build())
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
 

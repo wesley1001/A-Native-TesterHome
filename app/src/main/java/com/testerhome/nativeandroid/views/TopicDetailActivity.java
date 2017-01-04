@@ -2,6 +2,7 @@ package com.testerhome.nativeandroid.views;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -20,6 +21,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.jude.swipbackhelper.SwipeBackHelper;
 import com.testerhome.nativeandroid.Config;
 import com.testerhome.nativeandroid.R;
 import com.testerhome.nativeandroid.auth.TesterHomeAccountService;
@@ -32,18 +34,20 @@ import com.testerhome.nativeandroid.models.PraiseEntity;
 import com.testerhome.nativeandroid.models.TesterUser;
 import com.testerhome.nativeandroid.models.TopicDetailEntity;
 import com.testerhome.nativeandroid.models.TopicDetailResponse;
-import com.testerhome.nativeandroid.networks.TesterHomeApi;
+import com.testerhome.nativeandroid.models.TopicEntity;
+import com.testerhome.nativeandroid.networks.RestAdapterUtils;
+import com.testerhome.nativeandroid.oauth2.AuthenticationService;
 import com.testerhome.nativeandroid.utils.DeviceUtil;
 import com.testerhome.nativeandroid.utils.FavoriteUtil;
 import com.testerhome.nativeandroid.utils.PraiseUtil;
 import com.testerhome.nativeandroid.utils.StringUtils;
 import com.testerhome.nativeandroid.views.base.BackBaseActivity;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by vclub on 15/9/17.
@@ -56,17 +60,71 @@ public class TopicDetailActivity extends BackBaseActivity implements TopicReplyF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_topic_detail);
+        SwipeBackHelper.onCreate(this);
+        SwipeBackHelper.getCurrentPage(this)
+                .setSwipeBackEnable(true)
+                .setSwipeEdge(200)
+                .setSwipeEdgePercent(0.02f)//可滑动的范围。百分比。0.2表示为左边20%的屏幕
+                .setSwipeSensitivity(0.5f)//对横向滑动手势的敏感程度。0为迟钝 1为敏感
+                .setClosePercent(0.2f)//触发关闭Activity百分比
+                .setSwipeRelateEnable(false)//是否与下一级activity联动(微信效果)。默认关
+                .setSwipeRelateOffset(500);//activity联动时的偏移量。默认500px。
 
         setCustomTitle("帖子详情");
+        getSupportActionBar().setElevation(0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toolbar.setElevation(0);
+        }
 
-        if (getIntent().hasExtra("topic_id")) {
+        Uri uri = getIntent().getData();
+        if (uri != null){
+            mTopicId = uri.getLastPathSegment();
+            setupView();
+            loadInfo();
+        }else if (getIntent().hasExtra("topic_id")) {
             mTopicId = getIntent().getStringExtra("topic_id");
+
+            setupView();
+            loadInfo();
+        } else if (getIntent().hasExtra("topic")) {
+
+            TopicEntity topic = getIntent().getParcelableExtra("topic");
+            mTopicId = topic.getId();
+
+            setTopicInfo(topic);
 
             setupView();
             loadInfo();
         } else {
             finish();
         }
+    }
+
+    @Override
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        SwipeBackHelper.onPostCreate(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mCurrentUser == null) {
+            mCurrentUser = TesterHomeAccountService.getInstance(this).getActiveAccountInfo();
+
+            if (!TextUtils.isEmpty(mCurrentUser.getRefresh_token())
+                    && mCurrentUser.getExpireDate() <= System.currentTimeMillis()) {
+                AuthenticationService.refreshToken(getApplicationContext(),
+                        mCurrentUser.getRefresh_token());
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SwipeBackHelper.onDestroy(this);
     }
 
     @Override
@@ -92,10 +150,10 @@ public class TopicDetailActivity extends BackBaseActivity implements TopicReplyF
         return super.onOptionsItemSelected(item);
     }
 
-    @Bind(R.id.tab_layout)
+    @BindView(R.id.tab_layout)
     TabLayout tabLayoutTopicsTab;
 
-    @Bind(R.id.view_pager)
+    @BindView(R.id.view_pager)
     ViewPager viewPagerTopics;
 
     private TopicDetailPagerAdapter mAdapter;
@@ -105,7 +163,24 @@ public class TopicDetailActivity extends BackBaseActivity implements TopicReplyF
         viewPagerTopics.setAdapter(mAdapter);
 
         tabLayoutTopicsTab.setupWithViewPager(viewPagerTopics);
-        tabLayoutTopicsTab.setTabsFromPagerAdapter(mAdapter);
+    }
+
+    private void setTopicInfo(TopicEntity topicInfo) {
+
+        tvDetailTitle.setText(topicInfo.getTitle());
+        tvDetailName.setText(topicInfo.getNode_name().concat(" • "));
+        tvDetailUsername.setText(TextUtils.isEmpty(topicInfo.getUser().getLogin()) ?
+                "匿名用户" : topicInfo.getUser().getName());
+        tvDetailPublishDate.setText(StringUtils.formatPublishDateTime(
+                topicInfo.getCreated_at()).concat(" • ")
+                .concat("-").concat("次阅读"));
+        sdvDetailUserAvatar.setImageURI(Uri.parse(Config.getImageUrl(topicInfo.getUser().getAvatar_url())));
+        sdvDetailUserAvatar.setOnClickListener(view -> {
+            if (mTopicEntity != null && mTopicEntity.getUser() != null)
+                startActivity(new Intent().setClass(TopicDetailActivity.this, UserInfoActivity.class).
+                        putExtra("loginName", mTopicEntity.getUser()
+                                .getLogin()));
+        });
     }
 
     private MarkdownFragment mMarkdownFragment;
@@ -152,167 +227,236 @@ public class TopicDetailActivity extends BackBaseActivity implements TopicReplyF
         }
     }
 
-    @Bind(R.id.tv_detail_title)
+    @BindView(R.id.tv_detail_title)
     TextView tvDetailTitle;
-    @Bind(R.id.sdv_detail_user_avatar)
+    @BindView(R.id.sdv_detail_user_avatar)
     SimpleDraweeView sdvDetailUserAvatar;
-    @Bind(R.id.tv_detail_name)
+    @BindView(R.id.tv_detail_name)
     TextView tvDetailName;
-    @Bind(R.id.tv_detail_username)
+    @BindView(R.id.tv_detail_username)
     TextView tvDetailUsername;
-    @Bind(R.id.tv_detail_publish_date)
+    @BindView(R.id.tv_detail_publish_date)
     TextView tvDetailPublishDate;
-    @Bind(R.id.tv_detail_replies_count)
+    @BindView(R.id.tv_detail_replies_count)
     TextView tvDetailRepliesCount;
 
     TopicDetailEntity mTopicEntity;
 
     private void loadInfo() {
-        TesterHomeApi.getInstance().getTopicsService().getTopicById(mTopicId,
-                new Callback<TopicDetailResponse>() {
+
+        RestAdapterUtils.getRestAPI(this).getTopicById(mTopicId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<TopicDetailResponse>() {
                     @Override
-                    public void success(TopicDetailResponse topicDetailResponse, Response response) {
-                        mTopicEntity = topicDetailResponse.getTopic();
-                        tvDetailTitle.setText(mTopicEntity.getTitle());
-                        tvDetailName.setText(mTopicEntity.getNode_name().concat("."));
-                        tvDetailUsername.setText(TextUtils.isEmpty(mTopicEntity.getUser().getLogin()) ?
-                                "匿名用户" : mTopicEntity.getUser().getName());
-                        tvDetailPublishDate.setText(StringUtils.formatPublishDateTime(
-                                mTopicEntity.getCreated_at()).concat(".")
-                                .concat(mTopicEntity.getHits()).concat("次阅读"));
-                        sdvDetailUserAvatar.setImageURI(Uri.parse(Config.getImageUrl(mTopicEntity.getUser().getAvatar_url())));
+                    public void onCompleted() {
 
-                        // 用户回复数
-                        tvDetailRepliesCount.setText(getString(R.string.reply_count_info, mTopicEntity.getReplies_count()));
+                    }
 
-                        if (PraiseUtil.hasPraised(TopicDetailActivity.this, mTopicId)) {
-                            tvDetailPraise.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_heart_off, 0, 0, 0);
-                        } else {
-                            tvDetailPraise.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_heart, 0, 0, 0);
-                        }
-
-                        if (FavoriteUtil.hasFavorite(TopicDetailActivity.this, mTopicId)) {
-                            tvDetailCollect.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_bookmark_off, 0, 0, 0);
-                        } else {
-                            tvDetailCollect.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_bookmark, 0, 0, 0);
-                        }
-
-                        if (mMarkdownFragment != null) {
-                            mMarkdownFragment.showWebContent(topicDetailResponse.getTopic().getBody_html());
+                    @Override
+                    public void onError(Throwable t) {
+                        if (mFabAddComment != null) {
+                            Snackbar.make(mFabAddComment, "Error:" + t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                            Log.e("TopicDetailActivity", "Error:" + t.getMessage());
                         }
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
-                        if (mFabAddComment != null) {
-                            Snackbar.make(mFabAddComment, "Error:" + error.getMessage(), Snackbar.LENGTH_SHORT).show();
-                            Log.e("TopicDetailActivity", "Error:" + error.getMessage());
+                    public void onNext(TopicDetailResponse topicDetailResponse) {
+                        if (topicDetailResponse != null) {
+                            mTopicEntity = topicDetailResponse.getTopic();
+                            if (tvDetailTitle == null) {
+                                return;
+                            }
+                            tvDetailTitle.setText(mTopicEntity.getTitle());
+                            tvDetailName.setText(mTopicEntity.getNode_name().concat(" • "));
+                            tvDetailUsername.setText(TextUtils.isEmpty(mTopicEntity.getUser().getLogin()) ?
+                                    "匿名用户" : mTopicEntity.getUser().getName());
+                            tvDetailPublishDate.setText(StringUtils.formatPublishDateTime(
+                                    mTopicEntity.getCreated_at()).concat(" • ")
+                                    .concat(mTopicEntity.getHits()).concat("次阅读"));
+                            sdvDetailUserAvatar.setImageURI(Uri.parse(Config.getImageUrl(mTopicEntity.getUser().getAvatar_url())));
+                            sdvDetailUserAvatar.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    startActivity(new Intent().setClass(TopicDetailActivity.this, UserInfoActivity.class).
+                                            putExtra("loginName", mTopicEntity.getUser()
+                                                    .getLogin()));
+                                }
+                            });
+
+                            tvDetailPraise.setText(String.format("赞(%s)", topicDetailResponse.getTopic().getLikes_count()));
+                            // 用户回复数
+                            tvDetailRepliesCount.setText(getString(R.string.reply_count_info, mTopicEntity.getReplies_count()));
+
+                            if (PraiseUtil.hasPraised(TopicDetailActivity.this, mTopicId)) {
+                                tvDetailPraise.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_heart_off, 0, 0, 0);
+                            } else {
+                                tvDetailPraise.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_heart, 0, 0, 0);
+                            }
+
+                            if (FavoriteUtil.hasFavorite(TopicDetailActivity.this, mTopicId)) {
+                                tvDetailCollect.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_bookmark_off, 0, 0, 0);
+                            } else {
+                                tvDetailCollect.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_bookmark, 0, 0, 0);
+                            }
+
+                            if (mMarkdownFragment != null) {
+                                mMarkdownFragment.showWebContent(topicDetailResponse.getTopic().getBody_html());
+                            }
                         }
                     }
                 });
+
+
     }
 
     private TesterUser mCurrentUser;
-    @Bind(R.id.tv_detail_collect)
+    @BindView(R.id.tv_detail_collect)
     TextView tvDetailCollect;
-    @Bind(R.id.tv_detail_praise)
+    @BindView(R.id.tv_detail_praise)
     TextView tvDetailPraise;
+
+    boolean isFavorite = false;
 
     @OnClick(R.id.tv_detail_collect)
     void onDetailCollectClick() {
-        if (mCurrentUser == null) {
-            mCurrentUser = TesterHomeAccountService.getInstance(this).getActiveAccountInfo();
-            if (TextUtils.isEmpty(mCurrentUser.getLogin())) {
-                Snackbar.make(mFabAddComment, "请先登录客户端", Snackbar.LENGTH_SHORT).show();
-                return;
-            }
+        if (mCurrentUser == null || TextUtils.isEmpty(mCurrentUser.getLogin())) {
+            Snackbar.make(mFabAddComment, "请先登录客户端", Snackbar.LENGTH_SHORT).show();
+            return;
         }
 
-        // TODO: check login and token not expire
-        if (FavoriteUtil.hasFavorite(TopicDetailActivity.this, mTopicId)) {
-            // 取消收藏
-            TesterHomeApi.getInstance().getTopicsService().uncollectTopic(mTopicId, mCurrentUser.getAccess_token(), new Callback<CollectTopicResonse>() {
-                @Override
-                public void success(CollectTopicResonse collectTopicResonse, Response response) {
-                    if (collectTopicResonse.getOk() == 1) {
-                        Snackbar.make(mFabAddComment, "取消收藏成功", Snackbar.LENGTH_SHORT).show();
-                        FavoriteUtil.delFavorite(TopicDetailActivity.this, mTopicId);
-                        tvDetailCollect.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_bookmark, 0, 0, 0);
-                    }
-                }
+        if (FavoriteUtil.hasFavorite(this, mTopicId)) {
+            RestAdapterUtils.getRestAPI(this).uncollectTopic(mTopicId, mCurrentUser.getAccess_token())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<CollectTopicResonse>() {
+                        @Override
+                        public void onCompleted() {
 
-                @Override
-                public void failure(RetrofitError error) {
-                    Snackbar.make(mFabAddComment, "Error:" + error.getMessage(), Snackbar.LENGTH_SHORT).show();
-                }
-            });
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            Snackbar.make(mFabAddComment, "Error:" + t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onNext(CollectTopicResonse collectTopicResonse) {
+                            if (collectTopicResonse != null) {
+                                Snackbar.make(mFabAddComment, "取消收藏成功", Snackbar.LENGTH_SHORT).show();
+                                FavoriteUtil.delFavorite(TopicDetailActivity.this, mTopicId);
+                                if (tvDetailCollect != null) {
+                                    tvDetailCollect.setCompoundDrawablesWithIntrinsicBounds(R.drawable.bookmark_off, 0, 0, 0);
+                                }
+                            }
+                        }
+                    });
         } else {
-            TesterHomeApi.getInstance().getTopicsService().collectTopic(mTopicId, mCurrentUser.getAccess_token(), new Callback<CollectTopicResonse>() {
-                @Override
-                public void success(CollectTopicResonse collectTopicResonse, Response response) {
-                    if (collectTopicResonse.getOk() == 1) {
-                        Snackbar.make(mFabAddComment, "收藏成功", Snackbar.LENGTH_SHORT).show();
-                        FavoriteUtil.addTopicToFavorite(TopicDetailActivity.this, mTopicEntity);
-                        tvDetailCollect.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_bookmark_off, 0, 0, 0);
-                    }
-                }
+            RestAdapterUtils.getRestAPI(this).collectTopic(mTopicId, mCurrentUser.getAccess_token())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<CollectTopicResonse>() {
+                        @Override
+                        public void onCompleted() {
 
-                @Override
-                public void failure(RetrofitError error) {
-                    Snackbar.make(mFabAddComment, "Error:" + error.getMessage(), Snackbar.LENGTH_SHORT).show();
-                }
-            });
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            Snackbar.make(mFabAddComment, "Error:" + t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onNext(CollectTopicResonse collectTopicResonse) {
+                            if (collectTopicResonse != null) {
+                                Snackbar.make(mFabAddComment, "收藏成功", Snackbar.LENGTH_SHORT).show();
+
+                                if (tvDetailCollect != null && mTopicEntity != null) {
+                                    FavoriteUtil.addTopicToFavorite(TopicDetailActivity.this, mTopicEntity);
+                                    tvDetailCollect.setCompoundDrawablesWithIntrinsicBounds(R.drawable.bookmark_on, 0, 0, 0);
+                                }
+                            }
+                        }
+                    });
         }
 
     }
 
+    boolean isPraised = false;
 
     @OnClick(R.id.tv_detail_praise)
     void onDetailPraiseClick() {
-        if (mCurrentUser == null) {
-            mCurrentUser = TesterHomeAccountService.getInstance(this).getActiveAccountInfo();
-            if (TextUtils.isEmpty(mCurrentUser.getLogin())) {
-                Snackbar.make(mFabAddComment, "请先登录客户端", Snackbar.LENGTH_SHORT).show();
-                return;
-            }
+
+        if (mCurrentUser == null || TextUtils.isEmpty(mCurrentUser.getLogin())) {
+            Snackbar.make(mFabAddComment, "请先登录客户端", Snackbar.LENGTH_SHORT).show();
+            return;
         }
-        // TODO: check login and token not expire
+
         if (PraiseUtil.hasPraised(TopicDetailActivity.this, mTopicId)) {
-            TesterHomeApi.getInstance().getTopicsService().unLikeTopic(Config.PRAISE_TOPIC, mTopicId, mCurrentUser.getAccess_token(), new Callback<PraiseEntity>() {
-                @Override
-                public void success(PraiseEntity praiseEntity, Response response) {
-                    Snackbar.make(mFabAddComment, "取消点赞成功", Snackbar.LENGTH_SHORT).show();
-                    PraiseUtil.delPraise(TopicDetailActivity.this, mTopicId);
-                    tvDetailPraise.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_heart, 0, 0, 0);
-                }
+            RestAdapterUtils.getRestAPI(this)
+                    .unLikeTopic(Config.PRAISE_TOPIC, mTopicId, mCurrentUser.getAccess_token())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<PraiseEntity>() {
+                        @Override
+                        public void onCompleted() {
 
-                @Override
-                public void failure(RetrofitError error) {
-                    Snackbar.make(mFabAddComment, "Error:" + error.getMessage(), Snackbar.LENGTH_SHORT).show();
-                }
-            });
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            Snackbar.make(mFabAddComment, "Error:" + t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onNext(PraiseEntity praiseEntity) {
+                            if (praiseEntity != null) {
+                                Snackbar.make(mFabAddComment, "取消点赞成功", Snackbar.LENGTH_SHORT).show();
+                                PraiseUtil.delPraise(TopicDetailActivity.this, mTopicId);
+                                if (tvDetailPraise != null) {
+                                    tvDetailPraise.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_heart_outline_grey, 0, 0, 0);
+                                }
+                            }
+
+                        }
+                    });
         } else {
-            TesterHomeApi.getInstance().getTopicsService().praiseTopic(Config.PRAISE_TOPIC, mTopicId, mCurrentUser.getAccess_token(), new Callback<PraiseEntity>() {
-                @Override
-                public void success(PraiseEntity praiseEntity, Response response) {
-                    Snackbar.make(mFabAddComment, "点赞成功", Snackbar.LENGTH_SHORT).show();
-                    PraiseUtil.addPraise(TopicDetailActivity.this, mTopicEntity);
-                    tvDetailPraise.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_heart_off, 0, 0, 0);
-                }
+            RestAdapterUtils.getRestAPI(this).praiseTopic(Config.PRAISE_TOPIC, mTopicId, mCurrentUser.getAccess_token())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<PraiseEntity>() {
+                        @Override
+                        public void onCompleted() {
 
-                @Override
-                public void failure(RetrofitError error) {
-                    Snackbar.make(mFabAddComment, "Error:" + error.getMessage(), Snackbar.LENGTH_SHORT).show();
-                }
-            });
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            Snackbar.make(mFabAddComment, "Error:" + t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onNext(PraiseEntity praiseEntity) {
+                            if (praiseEntity != null) {
+                                Snackbar.make(mFabAddComment, "点赞成功", Snackbar.LENGTH_SHORT).show();
+                                if (tvDetailPraise != null && mTopicEntity != null) {
+                                    PraiseUtil.addPraise(TopicDetailActivity.this, mTopicEntity);
+                                    tvDetailPraise.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_heart_red, 0, 0, 0);
+                                }
+                            }
+
+                        }
+                    });
         }
+
 
     }
 
-    @Bind(R.id.llAddComment)
+    @BindView(R.id.llAddComment)
     View mAddCommentPanel;
 
-    @Bind(R.id.fab_add_comment)
+    @BindView(R.id.fab_add_comment)
     FloatingActionButton mFabAddComment;
 
     @OnClick(R.id.fab_add_comment)
@@ -321,7 +465,7 @@ public class TopicDetailActivity extends BackBaseActivity implements TopicReplyF
         mFabAddComment.setVisibility(View.GONE);
     }
 
-    @Bind(R.id.etComment)
+    @BindView(R.id.etComment)
     EditText mEtComment;
 
     // 回帖子
@@ -329,53 +473,63 @@ public class TopicDetailActivity extends BackBaseActivity implements TopicReplyF
     void onSendCommentClick() {
         mEtComment.setError(null);
 
+
+        if (mCurrentUser == null || TextUtils.isEmpty(mCurrentUser.getAccess_token())) {
+            Snackbar.make(mFabAddComment,
+                    "请先登录",
+                    Snackbar.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
         if (TextUtils.isEmpty(mEtComment.getText().toString())) {
             mEtComment.setError("请输入回复内容");
-        } else {
-            String replyBody = mEtComment.getText().toString();
 
+        } else {
+            String replyContent = mEtComment.getText().toString();
+            String replyBody = "";
             if (PreferenceManager.getDefaultSharedPreferences(this)
                     .getBoolean(SettingsFragment.KEY_PREF_COMMENT_WITH_SNACK, true)) {
-                replyBody = replyBody.concat("\n\n")
+                replyBody = replyContent.concat("\n\n")
                         .concat("—— 来自TesterHome官方 [安卓客户端](http://fir.im/p9vs)");
             }
 
-            if (mCurrentUser == null) {
-                mCurrentUser = TesterHomeAccountService.getInstance(this).getActiveAccountInfo();
-            }
-            TesterHomeApi.getInstance().getTopicsService()
-                    .createReply(mTopicId,
-                            replyBody,
-                            mCurrentUser.getAccess_token(),
-                            new Callback<CreateReplyResponse>() {
-                                @Override
-                                public void success(CreateReplyResponse createReplyResponse, Response response) {
-                                    if (createReplyResponse.getError() == null) {
-                                        // 发送成功
-                                        mEtComment.setText("");
-                                        DeviceUtil.hideSoftInput(TopicDetailActivity.this);
-                                        mAddCommentPanel.setVisibility(View.GONE);
-                                        mTopicReplyFragment.refreshReply();
-                                        // refresh reply count
-                                        if (createReplyResponse.getMeta() != null && createReplyResponse.getMeta().getCurrent_reply_count() > 0) {
-                                            updateReplyCount(createReplyResponse.getMeta().getCurrent_reply_count() + 1);
-                                        }
-                                    } else {
-                                        Snackbar.make(mFabAddComment,
-                                                createReplyResponse.getError().toString(),
-                                                Snackbar.LENGTH_SHORT)
-                                                .show();
-                                    }
-                                }
 
-                                @Override
-                                public void failure(RetrofitError error) {
-                                    Snackbar.make(mFabAddComment,
-                                            error.getMessage(),
-                                            Snackbar.LENGTH_SHORT)
-                                            .show();
+            final String finalReplyBody = replyContent;
+            RestAdapterUtils.getRestAPI(this).createReply(mTopicId, replyBody, mCurrentUser.getAccess_token())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<CreateReplyResponse>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            Snackbar.make(mFabAddComment,
+                                    t.getMessage(),
+                                    Snackbar.LENGTH_SHORT)
+                                    .show();
+                        }
+
+                        @Override
+                        public void onNext(CreateReplyResponse response) {
+                            if (response != null) {
+                                // 发送成功
+                                Log.d("detailActivity", "回帖成功");
+                                mEtComment.setText("");
+                                DeviceUtil.hideSoftInput(TopicDetailActivity.this);
+                                mAddCommentPanel.setVisibility(View.GONE);
+                                mTopicReplyFragment.updateReplyInfo(finalReplyBody);
+                                // refresh reply count
+                                if (response.getMeta() != null && response.getMeta().getCurrent_reply_count() > 0) {
+                                    updateReplyCount(response.getMeta().getCurrent_reply_count() + 1);
                                 }
-                            });
+                            }
+                        }
+                    });
+
         }
     }
 

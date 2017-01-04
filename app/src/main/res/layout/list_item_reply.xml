@@ -35,16 +35,16 @@
         android:layout_toRightOf="@+id/id_topic_item_author"
         tools:text="topic time" />
 
-    <TextView
+    <zhou.widget.RichText
         android:id="@+id/id_topic_item_content"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/id_topic_item_author"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@+id/id_user_avatar"
-        android:autoLink="all"
+        android:autoLink="email|web"
         tools:text="topic content" />
 
     <LinearLayout
@@ -56,6 +56,7 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/tv_reply_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"

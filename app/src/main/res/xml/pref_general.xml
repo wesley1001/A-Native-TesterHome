@@ -1,19 +1,27 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ListPreference
-        android:defaultValue="0"
-        android:entries="@array/pref_theme_list_titles"
-        android:entryValues="@array/pref_theme_list_values"
-        android:key="pref_theme_key"
-        android:summary="Light"
-        android:negativeButtonText="Cancel"
-        android:positiveButtonText="@null"
-        android:title="@string/pref_title_theme" />
+    <!--<ListPreference-->
+        <!--android:defaultValue="0"-->
+        <!--android:entries="@array/pref_theme_list_titles"-->
+        <!--android:entryValues="@array/pref_theme_list_values"-->
+        <!--android:key="pref_theme_key"-->
+        <!--android:summary="Light"-->
+        <!--android:negativeButtonText="Cancel"-->
+        <!--android:positiveButtonText="@null"-->
+        <!--android:title="@string/pref_title_theme" />-->
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="pref_theme"
+        android:summary="夜间模式"
+        android:textColor="?attr/main_bg"
+        android:title="主题样式" />
 
     <SwitchPreference
         android:defaultValue="true"
         android:key="pref_comment_with_snack_key"
         android:summary="回复的时候 最后一行添加来自xxx客户端"
-        android:title="Comment with App name" />
+        android:title="小尾巴" />
 
 </PreferenceScreen>

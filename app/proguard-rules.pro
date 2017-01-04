@@ -12,14 +12,42 @@
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+-keepclassmembers class com.testerhome.nativeandroid.fragments.MarkdownFragment$JavascriptInterface {
+   public *;
+}
 
--dontwarn retrofit.**
--keep class retrofit.** { *; }
+-keepattributes *Annotation*
+-keepattributes *JavascriptInterface*
+
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+-keepattributes SourceFile,LineNumberTable
+
+# Keep our interfaces so they can be used by other ProGuard rules.
+# See http://sourceforge.net/p/proguard/bugs/466/
+-keep,allowobfuscation @interface com.facebook.common.internal.DoNotStrip
+
+# Do not strip any method/class that is annotated with @DoNotStrip
+-keep @com.facebook.common.internal.DoNotStrip class *
+-keepclassmembers class * {
+    @com.facebook.common.internal.DoNotStrip *;
+}
+
+# Keep native methods
+-keepclassmembers class * {
+    native <methods>;
+}
+
+-dontwarn okhttp3.**
+-keep class okhttp3.** { *; }
+
+-dontwarn com.squareup.okhttp.**
+
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-dontwarn com.android.volley.toolbox.**
 
 
 -keep class butterknife.** { *; }
@@ -37,13 +65,58 @@
 -keep class com.testerhome.nativeandroid.models.** {*;}
 -dontwarn com.testerhome.nativeandroid.models.**
 
--keep class im.fir.sdk.** {*;}
--dontwarn im.fir.sdk.**
+-keep class com.testerhome.nativeandroid.dao.** {*;}
+-dontwarn com.testerhome.nativeandroid.dao.**
 
--dontwarn com.umeng.**
--keep class com.umeng.update.** {*;}
--keep class com.umeng.analytics.** {*;}
+-dontwarn com.tencent.**
+-keep class com.tencent.** {*;}
 
--keep class com.tencent.mm.sdk.** {
-   *;
+
+
+# RxJava 1.1.0 --start--
+-dontwarn sun.misc.**
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+   long producerIndex;
+   long consumerIndex;
 }
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+# RxJava 1.1.0 --end--
+
+#Gson
+-keepattributes Signature
+
+-assumenosideeffects class android.util.Log {
+public static boolean isLoggable(java.lang.String, int);
+public static int v(...);
+public static int i(...);
+public static int w(...);
+public static int d(...);
+public static int e(...);
+}
+
+-keepclassmembers class * extends de.greenrobot.dao.AbstractDao {
+public static java.lang.String TABLENAME;
+}
+-keep class **$Properties
+
+
+## Android 6.0
+-dontwarn org.apache.http.**
+-dontwarn android.net.http.AndroidHttpClient
+
+-dontwarn com.google.android.**
+-keep class com.google.android.** {*;}
+
+-keep class android.support.v7.** {*;}
+
+## retrolambda
+-dontwarn java.lang.invoke.*
+
+-dontwarn com.tonicartos.**
+-keep class com.tonicartos.** {*;}
+
+## bugly
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}

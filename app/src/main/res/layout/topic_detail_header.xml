@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    tools:background="@color/bg_main_dark"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -20,38 +21,8 @@
             android:textColor="@android:color/white"
             tools:text="2015 Selenium 大会" />
 
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/sdv_detail_user_avatar"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_alignParentRight="true"
-            fresco:placeholderImage="@mipmap/ic_launcher"
-            fresco:roundAsCircle="true" />
 
-        <TextView
-            android:id="@+id/tv_detail_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_detail_title"
-            android:textColor="@android:color/white"
-            tools:text="node name." />
 
-        <TextView
-            android:id="@+id/tv_detail_username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_detail_title"
-            android:layout_toRightOf="@+id/tv_detail_name"
-            android:textColor="@android:color/white"
-            tools:text="username." />
-
-        <TextView
-            android:id="@+id/tv_detail_publish_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_detail_name"
-            android:textColor="@android:color/white"
-            tools:text="datetime." />
     </RelativeLayout>
 
     <LinearLayout

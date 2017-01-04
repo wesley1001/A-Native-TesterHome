@@ -1,9 +1,12 @@
 package com.testerhome.nativeandroid.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Bin Li on 2015/9/15.
  */
-public class UserEntity {
+public class UserEntity implements Parcelable {
     /**
      * id : 104
      * login : seveniruby
@@ -47,4 +50,40 @@ public class UserEntity {
     public String getAvatar_url() {
         return avatar_url;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeString(this.login);
+        dest.writeString(this.name);
+        dest.writeString(this.avatar_url);
+    }
+
+    public UserEntity() {
+    }
+
+    protected UserEntity(Parcel in) {
+        this.id = in.readInt();
+        this.login = in.readString();
+        this.name = in.readString();
+        this.avatar_url = in.readString();
+    }
+
+    public static final Parcelable.Creator<UserEntity> CREATOR = new Parcelable.Creator<UserEntity>() {
+        @Override
+        public UserEntity createFromParcel(Parcel source) {
+            return new UserEntity(source);
+        }
+
+        @Override
+        public UserEntity[] newArray(int size) {
+            return new UserEntity[size];
+        }
+    };
 }

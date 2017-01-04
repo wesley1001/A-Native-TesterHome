@@ -1,5 +1,9 @@
 package com.testerhome.nativeandroid.utils;
 
+import org.tautua.markdownpapers.Markdown;
+
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -79,4 +83,24 @@ public class StringUtils {
             return  new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault()).format(new Date(times * 1000));
         }
     }
+
+
+    /**
+     * CNode兼容性的Markdown转换
+     * 最外层包裹 <div class="markdown-text"></div> 以保证和服务端渲染同步
+     */
+    private static final Markdown md = new Markdown();
+
+    public static String renderMarkdown(String text) {
+        StringWriter out = new StringWriter();
+        try {
+            md.transform(new StringReader(text), out);
+        } catch (org.tautua.markdownpapers.parser.ParseException e) {
+            e.printStackTrace();
+        }
+        text = out.toString();
+        return "<div class=\"markdown-text\">" + text + "</div>";
+    }
+
+
 }

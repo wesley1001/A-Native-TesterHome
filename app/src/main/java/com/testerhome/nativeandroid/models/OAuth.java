@@ -8,7 +8,10 @@ public class OAuth {
     private String token_type;
     private long expires_in;
     private String refresh_token;
-    private long craete_at;
+    private long create_at;
+    private long expireDate;
+
+    // TODO: 2016/11/20 [avatar_url] [id] [login] [name]
 
     public String getAccess_token() {
         return access_token;
@@ -43,11 +46,19 @@ public class OAuth {
     }
 
     public long getCraete_at() {
-        return craete_at;
+        return create_at;
     }
 
     public void setCraete_at(long craete_at) {
-        this.craete_at = craete_at;
+        this.create_at = craete_at;
+    }
+
+    public long getExpireDate() {
+        return expireDate;
+    }
+
+    public void setExpireDate(long expireDate) {
+        this.expireDate = expireDate;
     }
 
     @Override
@@ -55,9 +66,10 @@ public class OAuth {
         return "OAuth{" +
                 "access_token='" + access_token + '\'' +
                 ", token_type='" + token_type + '\'' +
-                ", expires_in='" + expires_in + '\'' +
+                ", expires_in=" + expires_in +
                 ", refresh_token='" + refresh_token + '\'' +
-                ", craete_at='" + craete_at + '\'' +
+                ", create_at=" + create_at +
+                ", expireDate=" + expireDate +
                 '}';
     }
 }

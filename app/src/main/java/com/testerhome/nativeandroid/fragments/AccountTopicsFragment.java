@@ -10,39 +10,42 @@ import com.testerhome.nativeandroid.R;
 import com.testerhome.nativeandroid.auth.TesterHomeAccountService;
 import com.testerhome.nativeandroid.models.TesterUser;
 import com.testerhome.nativeandroid.models.TopicsResponse;
-import com.testerhome.nativeandroid.networks.TesterHomeApi;
+import com.testerhome.nativeandroid.networks.RestAdapterUtils;
 import com.testerhome.nativeandroid.views.adapters.TopicsListAdapter;
 import com.testerhome.nativeandroid.views.widgets.DividerItemDecoration;
 
-import butterknife.Bind;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import butterknife.BindView;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by vclub on 15/10/14.
  */
 public class AccountTopicsFragment extends BaseFragment {
 
-    @Bind(R.id.rv_topic_list)
+    @BindView(R.id.rv_list)
     RecyclerView recyclerViewTopicList;
 
-    @Bind(R.id.srl_refresh)
+    @BindView(R.id.srl_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
 
     private int mNextCursor = 0;
 
     private TopicsListAdapter mAdatper;
+    private String loginName;
 
-
-    public static AccountTopicsFragment newInstance() {
+    public static AccountTopicsFragment newInstance(String loginName) {
+        Bundle bundle = new Bundle();
+        bundle.putString("loginName",loginName);
         AccountTopicsFragment fragment = new AccountTopicsFragment();
+        fragment.setArguments(bundle);
         return fragment;
     }
 
     @Override
     protected int getLayoutRes() {
-        return R.layout.fragment_topics;
+        return R.layout.fragment_base_recycler;
     }
 
     @Override
@@ -52,6 +55,9 @@ public class AccountTopicsFragment extends BaseFragment {
         if (mTesterHomeAccount == null) {
             getUserInfo();
         }
+
+
+        loginName = getArguments().getString("loginName");
         loadTopics(true);
     }
 
@@ -98,27 +104,43 @@ public class AccountTopicsFragment extends BaseFragment {
 
     private void loadTopics(boolean showloading) {
         if (showloading)
-            showLoadingView();
+            showEmptyView();
 
-        TesterHomeApi.getInstance().getTopicsService().getUserTopics(mTesterHomeAccount.getLogin(),
-                mTesterHomeAccount.getAccess_token(),
-                mNextCursor*20,
-                new Callback<TopicsResponse>() {
+
+        RestAdapterUtils.getRestAPI(getActivity()).getUserTopics(loginName,
+                mTesterHomeAccount.getAccess_token(), mNextCursor * 20)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<TopicsResponse>() {
                     @Override
-                    public void success(TopicsResponse topicsResponse, Response response) {
-                        hideLoadingView();
-                        if (swipeRefreshLayout.isRefreshing()) {
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        hideEmptyView();
+                        if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                             swipeRefreshLayout.setRefreshing(false);
                         }
-                        if (topicsResponse.getTopics().size() > 0) {
+                        Log.e("demo", "failure() called with: " + "error = [" + t + "]"
+                                , t);
+                    }
 
+                    @Override
+                    public void onNext(TopicsResponse response) {
+                        hideEmptyView();
+                        if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if (response != null && response.getTopics().size() > 0) {
                             if (mNextCursor == 0) {
-                                mAdatper.setItems(topicsResponse.getTopics());
+                                mAdatper.setItems(response.getTopics());
                             } else {
-                                mAdatper.addItems(topicsResponse.getTopics());
+                                mAdatper.addItems(response.getTopics());
                             }
 
-                            if (topicsResponse.getTopics().size() == 20) {
+                            if (response.getTopics().size() == 20) {
                                 mNextCursor += 1;
                             } else {
                                 mNextCursor = 0;
@@ -127,16 +149,7 @@ public class AccountTopicsFragment extends BaseFragment {
                             mNextCursor = 0;
                         }
                     }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        hideLoadingView();
-                        if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                        Log.e("demo", "failure() called with: " + "error = [" + error + "]"
-                                + error.getUrl());
-                    }
                 });
+
     }
 }

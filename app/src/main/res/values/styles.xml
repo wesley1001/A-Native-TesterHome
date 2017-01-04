@@ -1,15 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorControlNormal">#CCFFFFFF</item>
+
+        <item name="android:windowIsTranslucent">true</item>
+        <!--<item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>-->
+        <!--<item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>-->
     </style>
 
     <style name="AppTheme.NoActionBar">
+        <item name="android:windowIsTranslucent">false</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -36,11 +41,19 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorControlNormal">#CCFFFFFF</item>
+        //文字主题颜色
+        <item name="android:textColorPrimary">@color/material_grey_900</item>
+        <item name="android:textColorSecondary">@color/material_grey_850</item>
 
         <item name="main_bg">@color/bg_main_normal</item>
         <item name="main_text_color">@color/text_color_main_normal</item>
         <item name="second_bg">@color/bg_second_normal</item>
         <item name="second_text_color">@color/text_color_second_normal</item>
+        <item name="widgetBackground">@color/selectable_item_background_general_light_normal</item>
+        <item name="widgetBackgroundDark">@color/selectable_item_background_general_light_pressed</item>
+        <item name="navigationItemTextColor">@color/nav_item_light_color</item>
+        <item name="widgetBackgroundTitle">@color/bg_main_dark</item>
+        <item name="selectableItemBackgroundGeneral">@drawable/selectable_item_background_general_light</item>
     </style>
 
     <style name="theme_dark">
@@ -48,17 +61,67 @@
         <item name="colorPrimaryDark">@color/bg_main_dark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorControlNormal">#CCFFFFFF</item>
+        //文字主题颜色
+        <item name="android:textColorPrimary">@color/material_grey_100</item>
+        <item name="android:textColorSecondary">@color/material_grey_50</item>
         <item name="android:textColor">@color/text_color_main_dark</item>
-
         <item name="main_bg">@color/bg_main_dark</item>
         <item name="main_text_color">@color/text_color_main_dark</item>
         <item name="second_bg">@color/bg_second_dark</item>
         <item name="second_text_color">@color/text_color_second_dark</item>
+        <item name="widgetBackground">@color/selectable_item_background_general_dark_normal</item>
+        <item name="widgetBackgroundDark">@color/selectable_item_background_general_dark_pressed</item>
+        <item name="widgetBackgroundTitle">@color/white</item>
+        <item name="navigationItemTextColor">@color/nav_item_color</item>
+        <item name="selectableItemBackgroundGeneral">@drawable/selectable_item_background_general_dark</item>
     </style>
 
     <style name="DirectShareDialogTheme" parent="@style/Theme.AppCompat.Light.Dialog">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- App Widget -->
+    <style name="AppWidget" parent="Theme.AppCompat.Light" />
+
+    <!-- Deep Line -->
+    <style name="AppWidget.DeepLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/tab_item_tint_default</item>
+    </style>
+
+    <style name="AppWidget.DeepLine.Vertical">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+
+    <style name="AppDialogLight" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowMinWidthMajor">@fraction/dialog_min_width_major</item>
+        <item name="windowMinWidthMinor">@fraction/dialog_min_width_minor</item>
+    </style>
+
+    <!-- App Dialog Dark -->
+    <style name="AppDialogDark" parent="Theme.AppCompat.Dialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowMinWidthMajor">@fraction/dialog_min_width_major</item>
+        <item name="windowMinWidthMinor">@fraction/dialog_min_width_minor</item>
+    </style>
+
+    <!-- Customize theme for floating. -->
+    <style name="AppTheme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
     </style>
 </resources>

@@ -15,8 +15,11 @@ public class Config {
     public static final String TOPICS_TYPE_LAST_ACTIVED = "last_actived";
 
     public static final int TOPIC_JOB_NODE_ID = 19;
+    public static final int TOPIC_MOOC_NODE_ID = 67;
+    public static final int TOPIC_BUGS_NODE_ID = 47;
 
-    public static final String BASE_URL = "https://testerhome.com/api/v3";
+    public static final String BASE_URL = "https://testerhome.com/api/v3/";
+    public static final String WIKI_URL = "https://testerhome.com/wiki";
 
     public static final String FOLLOW = "Follow";
     public static final String TOPIC = "Topic";

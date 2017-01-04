@@ -5,19 +5,36 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/tab_main_home"
-            android:title="@string/main_tab_home" />
+            android:title="@string/main_tab_home"/>
         <item
-            android:id="@+id/nav_topic"
-            android:icon="@drawable/tab_main_topic"
-            android:title="@string/main_tab_topic" />
+            android:id="@+id/nav_category"
+            android:icon="@drawable/tab_main_home"
+            android:title="@string/main_tab_category"/>
         <item
             android:id="@+id/nav_job"
             android:icon="@drawable/tab_main_job"
             android:title="@string/main_tab_job" />
+        <item
+            android:id="@+id/nav_mooc"
+            android:icon="@drawable/tab_main_job"
+            android:title="@string/main_tab_mooc" />
+        <item
+            android:id="@+id/nav_bugs"
+            android:icon="@drawable/tab_main_topic"
+            android:title="@string/main_tab_bugs" />
+        <item
+            android:id="@+id/nav_topic"
+            android:icon="@drawable/tab_main_topic"
+            android:title="@string/main_tab_topic" />
+
     </group>
 
     <group android:id="@+id/group_settings"
         android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_wiki"
+            android:icon="@drawable/perm_group_system_tools"
+            android:title="@string/main_drawer_wiki" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/perm_group_system_tools"
