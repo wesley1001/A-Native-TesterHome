@@ -179,7 +179,7 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
         void onListEnded();
     }
 
-    private static class NotificationHolder extends RecyclerView.ViewHolder {
+    static class NotificationHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_user_avatar)
         SimpleDraweeView userAvatar;
@@ -202,7 +202,7 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
     }
 
 
-    private static class DeleteFloorHolder extends RecyclerView.ViewHolder {
+    static class DeleteFloorHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_topic_item_content)
         TextView topicItemBody;
@@ -214,7 +214,7 @@ public class NotificationAdapter extends BaseAdapter<NotificationEntity> {
     }
 
 
-    private static class NotificationSingleHolder extends RecyclerView.ViewHolder {
+    static class NotificationSingleHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.id_user_avatar)
         SimpleDraweeView userAvatar;
